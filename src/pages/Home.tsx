@@ -276,7 +276,7 @@ export const Home = () => {
           />
         </div>
 
-        {/* --- Stats Section --- */}
+        --- Stats Section ---
         <div className="bg-white rounded-3xl shadow-2xl p-10 mb-20 border-t-4 border-green-500">
           <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
             Why BlueTrace Matters
