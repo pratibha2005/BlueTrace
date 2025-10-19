@@ -222,6 +222,6 @@ const StatCard = ({ icon, title, value, color }: {
       {icon}
     </div>
     <h3 className="text-sm text-gray-600 mb-1">{title}</h3>
-    <div className="text-2xl font-bold text-gray-800">{value}</div>
+    <div className="text-2xl font-bold text-gray-900">{value}</div>
   </div>
 );

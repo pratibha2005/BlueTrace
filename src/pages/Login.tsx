@@ -115,18 +115,19 @@ const CarAnimation = () => (
             {/* The Car Body (Simple SVG) */}
             <svg
                 className="absolute bottom-0 left-0 transition-transform duration-1000 ease-in-out"
-                style={{ transform: 'translateX(0)', animation: 'moveCar 8s infinite alternate' }}
+                style={{ transform: 'translateX(0)', animation: 'moveCar 1s infinite alternate' }}
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 100 40"
-                width="150"
+                width="250"
                 height="60"
             >
                 <style>
+                  
                     {`
                         /* Keyframes from previous version */
                         @keyframes moveCar {
                             0% { transform: translateX(0px); }
-                            100% { transform: translateX(10px); }
+                            100% { transform: translateX(100px); }
                         }
                     `}
                     {/* Unique Smoke keyframes (can be adjusted) */}

@@ -4,3 +4,23 @@
 
 
 @import url('https://fonts.googleapis.com/css2?family=Licorice&display=swap');
+
+
+
+
+
+.car-animation {
+  position: absolute;
+  bottom: 20px;
+  left: -250px; /* start outside the box */
+  animation: moveCar 6s linear infinite;
+}
+
+@keyframes moveCar {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(120vw); /* moves across full width and exits */
+  }
+}
