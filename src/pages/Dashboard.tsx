@@ -30,7 +30,7 @@ interface Emission {
   co2Emissions: number;
   vehicleType: string;
 }
-
+// Dashboard functionality
 export const Dashboard = () => {
   const [stats, setStats] = useState<Stats | null>(null);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
