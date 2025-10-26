@@ -20,8 +20,8 @@ const StatCard = ({ number, label }) => (
     <div className="text-gray-600 text-lg font-medium">{label}</div>
   </div>
 );
-
-// --- Modern Feature Card ---
+ 
+// Feature card
 const FeatureCard = ({
   icon,
   title,
@@ -309,7 +309,7 @@ export const Home = () => {
               <span
                 className="inline-block text-white drop-shadow-2xl"
                 style={{
-                  textShadow: "0 0 40px rgba(16, 185, 129, 0.5)",
+                  textShadow: "0 0 40px rgba(53, 184, 140, 0.5)",
                   transform: `scale(${1 + Math.cos(scrollY * 0.005) * 0.02})`,
                   transition: "transform 0.3s ease-out",
                 }}
@@ -333,11 +333,11 @@ export const Home = () => {
             ))}
           </div>
 
-          {/* Bottom Glow Line */}
+          {/* Bottom Glow Line */} 
+
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent opacity-50"></div>
         </div>
 
-        {/* --- Stats Section --- */}
         <div className="bg-white rounded-3xl shadow-2xl p-10 mb-20 border-t-4 border-green-500">
           <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
             Why BlueTrace Matters
