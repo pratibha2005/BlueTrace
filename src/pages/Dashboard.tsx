@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { TrendingDown, Award, Lightbulb, Activity, Calendar, Leaf, Car, Bike, Bus, Plane } from 'lucide-react';
+import { LineChart, Line, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { TrendingDown, Award, Lightbulb, Activity, Calendar, Leaf, Car, Bike, Bus, Plane, ArrowUpRight, Zap, Target, TrendingUp } from 'lucide-react';
 import { calculatorAPI, suggestionsAPI, badgeAPI } from '../services/api';
 
 interface Stats {
@@ -30,7 +30,17 @@ interface Emission {
   co2Emissions: number;
   vehicleType: string;
 }
-// Dashboard functionality
+
+const VEHICLE_CONFIG = {
+  car: { icon: Car, color: '#3B82F6' },
+  bike: { icon: Bike, color: '#10B981' },
+  bus: { icon: Bus, color: '#F59E0B' },
+  plane: { icon: Plane, color: '#EF4444' },
+  train: { icon: Bus, color: '#8B5CF6' },
+  motorcycle: { icon: Bike, color: '#06B6D4' },
+  electric_car: { icon: Car, color: '#10B981' }
+};
+
 export const Dashboard = () => {
   const [stats, setStats] = useState<Stats | null>(null);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -39,383 +49,317 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [statsData, suggestionsData, badgesData, historyData] = await Promise.all([
-          calculatorAPI.getStats(),
-          suggestionsAPI.getSuggestions(),
-          badgeAPI.getBadges(),
-          calculatorAPI.getHistory()
-        ]);
-
+    Promise.all([
+      calculatorAPI.getStats(),
+      suggestionsAPI.getSuggestions(),
+      badgeAPI.getBadges(),
+      calculatorAPI.getHistory()
+    ])
+      .then(([statsData, suggestionsData, badgesData, historyData]) => {
         setStats(statsData);
         setSuggestions(suggestionsData);
         setBadges(badgesData);
         setHistory(historyData);
-      } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+      })
+      .catch(err => console.error('Failed to fetch dashboard data:', err))
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <div className="text-xl text-gray-600 font-medium">Loading your dashboard...</div>
-          <div className="text-sm text-gray-500 mt-2">Gathering your carbon insights</div>
+          <div className="w-20 h-20 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-700 text-lg font-semibold">Loading your dashboard...</p>
         </div>
       </div>
     );
   }
 
-  const chartData = history.slice(0, 10).reverse().map((emission, index) => ({
-    name: `Trip ${index + 1}`,
-    emissions: emission.co2Emissions
+  const chartData = history.slice(0, 10).reverse().map((e, i) => ({
+    name: `${i + 1}`,
+    emissions: e.co2Emissions
   }));
 
   const vehicleData = stats?.vehicleBreakdown
     ? Object.entries(stats.vehicleBreakdown).map(([vehicle, emissions]) => ({
         vehicle,
         emissions,
-        fill: getVehicleColor(vehicle)
+        fill: VEHICLE_CONFIG[vehicle.toLowerCase() as keyof typeof VEHICLE_CONFIG]?.color || '#6B7280'
       }))
     : [];
 
-  const pieData = vehicleData.map(item => ({
-    name: item.vehicle,
-    value: item.emissions,
-    fill: item.fill
-  }));
-
-
-  function getVehicleColor(vehicle: string) {
-    const colorMap: Record<string, string> = {
-      'car': '#3B82F6',
-      'bike': '#10B981',
-      'bus': '#F59E0B',
-      'plane': '#EF4444',
-      'train': '#8B5CF6',
-      'motorcycle': '#06B6D4'
-    };
-    return colorMap[vehicle.toLowerCase()] || '#6B7280';
-  }
-
-  function getVehicleIcon(vehicle: string) {
-    const iconMap: Record<string, React.ReactNode> = {
-      'car': <Car className="w-5 h-5" />,
-      'bike': <Bike className="w-5 h-5" />,
-      'bus': <Bus className="w-5 h-5" />,
-      'plane': <Plane className="w-5 h-5" />,
-      'train': <Bus className="w-5 h-5" />,
-      'motorcycle': <Bike className="w-5 h-5" />
-    };
-    return iconMap[vehicle.toLowerCase()] || <Car className="w-5 h-5" />;
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Header Section */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-10">
-        <div className="container mx-auto max-w-7xl px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Carbon Dashboard
-              </h1>
-              <p className="text-gray-600 mt-1">Track your environmental impact</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <div className="text-sm text-gray-500">Total Trips</div>
-                <div className="text-2xl font-bold text-gray-900">{stats?.totalCalculations || 0}</div>
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 p-6">
+      <div className="max-w-[1400px] mx-auto">
+        {/* Welcome Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Welcome back! 👋</h1>
+          <p className="text-gray-600">Here's your carbon footprint overview</p>
+        </div>
+
+        {/* Top Stats - Hero Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          {/* Primary Card - Total Emissions */}
+          <div className="relative bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-8 text-white overflow-hidden shadow-xl col-span-1 md:col-span-2">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24"></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                  <Activity className="w-6 h-6" />
+                </div>
+                <span className="text-emerald-100 font-medium">Total Carbon Footprint</span>
               </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-                <Leaf className="w-6 h-6 text-white" />
+              <div className="flex items-end gap-4 mb-6">
+                <h2 className="text-6xl font-bold">{stats?.totalEmissions || '0'}</h2>
+                <span className="text-3xl font-semibold text-emerald-100 mb-2">kg CO₂</span>
+              </div>
+              <div className="flex items-center gap-2 text-emerald-100">
+                <div className="px-3 py-1.5 bg-white/20 rounded-full text-sm font-medium flex items-center gap-1">
+                  <TrendingDown className="w-4 h-4" />
+                  <span>12% less than last month</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div className="container mx-auto max-w-7xl px-4 py-8">
-        {/* Stats Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Total Trips Card */}
+          <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+                <Target className="w-7 h-7 text-white" />
+              </div>
+              <ArrowUpRight className="w-5 h-5 text-gray-400" />
+            </div>
+            <p className="text-gray-600 text-sm font-medium mb-2">Total Trips</p>
+            <h3 className="text-4xl font-bold text-gray-900 mb-2">{stats?.totalCalculations || 0}</h3>
+            <div className="flex items-center gap-1 text-green-600 text-sm font-medium">
+              <TrendingUp className="w-4 h-4" />
+              <span>+8 this week</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Secondary Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           <StatCard
-            icon={<Activity className="w-8 h-8" />}
-            title="Total Emissions"
-            value={`${stats?.totalEmissions || 0} kg`}
-            subtitle="CO₂ equivalent"
-            color="from-red-500 to-pink-500"
+            icon={TrendingDown}
+            label="Avg per Trip"
+            value={stats?.avgEmissions || '0'}
+            unit="kg"
+            gradient="from-blue-500 to-cyan-500"
+            trend="-5%"
+            trendUp={false}
+          />
+          <StatCard
+            icon={Calendar}
+            label="This Month"
+            value={stats?.monthlyEmissions || '0'}
+            unit="kg"
+            gradient="from-purple-500 to-pink-500"
             trend="+12%"
             trendUp={true}
           />
           <StatCard
-            icon={<TrendingDown className="w-8 h-8" />}
-            title="Average per Trip"
-            value={`${stats?.avgEmissions || 0} kg`}
-            subtitle="Per journey"
-            color="from-blue-500 to-cyan-500"
-            trend="-8%"
-            trendUp={false}
-          />
-          <StatCard
-            icon={<Calendar className="w-8 h-8" />}
-            title="This Month"
-            value={`${stats?.monthlyEmissions || 0} kg`}
-            subtitle="Current month"
-            color="from-green-500 to-emerald-500"
-            trend="+5%"
+            icon={Award}
+            label="Badges Earned"
+            value={badges.length.toString()}
+            unit="total"
+            gradient="from-amber-500 to-orange-500"
+            trend="+2 new"
             trendUp={true}
           />
           <StatCard
-            icon={<Award className="w-8 h-8" />}
-            title="Badges Earned"
-            value={badges.length.toString()}
-            subtitle="Achievements"
-            color="from-yellow-500 to-orange-500"
-            trend="+2"
+            icon={Zap}
+            label="Eco Score"
+            value="87"
+            unit="/100"
+            gradient="from-green-500 to-emerald-500"
+            trend="+3 pts"
             trendUp={true}
           />
         </div>
 
-        {/* Charts Section */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          {/* Emission Trends Chart */}
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300">
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-3 gap-6 mb-6">
+          {/* Emission Trends - Takes 2 columns */}
+          <div className="lg:col-span-2 bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">Emission Trends</h2>
-                <p className="text-gray-600 text-sm">Your journey over time</p>
+                <h3 className="text-xl font-bold text-gray-900">Emission Trends</h3>
+                <p className="text-gray-500 text-sm mt-1">Last 10 trips</p>
               </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-blue-500 rounded-xl flex items-center justify-center">
-                <TrendingDown className="w-6 h-6 text-white" />
+              <div className="flex gap-2">
+                <button className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-sm font-medium hover:bg-emerald-100 transition-colors">
+                  Weekly
+                </button>
+                <button className="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors">
+                  Monthly
+                </button>
               </div>
             </div>
             {chartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis 
-                    dataKey="name" 
-                    tick={{ fontSize: 12, fill: '#6b7280' }}
-                    axisLine={{ stroke: '#e5e7eb' }}
-                  />
-                  <YAxis 
-                    tick={{ fontSize: 12, fill: '#6b7280' }}
-                    axisLine={{ stroke: '#e5e7eb' }}
-                  />
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'white',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '12px',
-                      boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
-                    }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="emissions" 
-                    stroke="url(#colorGradient)" 
-                    strokeWidth={3}
-                    dot={{ fill: '#3b82f6', strokeWidth: 2, r: 6 }}
-                    activeDot={{ r: 8, stroke: '#3b82f6', strokeWidth: 2 }}
-                  />
+              <ResponsiveContainer width="100%" height={320}>
+                <AreaChart data={chartData}>
                   <defs>
-                    <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stopColor="#3b82f6" />
-                      <stop offset="100%" stopColor="#10b981" />
+                    <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.05} />
                     </linearGradient>
                   </defs>
-                </LineChart>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{ fill: '#9ca3af', fontSize: 12 }} 
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis 
+                    tick={{ fill: '#9ca3af', fontSize: 12 }} 
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'white', 
+                      border: 'none',
+                      borderRadius: '16px',
+                      boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+                      padding: '12px 16px'
+                    }}
+                    labelStyle={{ color: '#111827', fontWeight: 600 }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="emissions" 
+                    stroke="#10b981" 
+                    strokeWidth={3}
+                    fill="url(#areaGradient)"
+                    dot={{ fill: '#10b981', strokeWidth: 2, r: 4, stroke: '#fff' }}
+                    activeDot={{ r: 6, strokeWidth: 2 }}
+                  />
+                </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Activity className="w-8 h-8 text-gray-400" />
-                </div>
-                <p className="text-gray-500 text-lg font-medium">No data yet</p>
-                <p className="text-gray-400 text-sm mt-1">Start calculating emissions to see trends!</p>
-              </div>
+              <EmptyState icon={Activity} message="No trips yet" subtext="Start tracking your journeys" />
             )}
           </div>
 
-          {/* Vehicle Breakdown Chart */}
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">Vehicle Breakdown</h2>
-                <p className="text-gray-600 text-sm">Emissions by transport type</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-xl flex items-center justify-center">
-                <Car className="w-6 h-6 text-white" />
+          {/* Quick Actions */}
+          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 text-white shadow-xl">
+            <h3 className="text-xl font-bold mb-6">Quick Actions</h3>
+            <div className="space-y-3">
+              <ActionButton icon={Car} label="Calculate Trip" gradient="from-emerald-400 to-teal-500" />
+              <ActionButton icon={Award} label="View Badges" gradient="from-amber-400 to-orange-500" />
+              <ActionButton icon={Lightbulb} label="Get Tips" gradient="from-yellow-400 to-amber-500" />
+              <ActionButton icon={Target} label="Set Goals" gradient="from-blue-400 to-cyan-500" />
+            </div>
+            <div className="mt-6 p-4 bg-white/10 backdrop-blur-sm rounded-2xl">
+              <p className="text-sm text-gray-300 mb-2">Carbon Saved This Month</p>
+              <p className="text-3xl font-bold">24.5 kg</p>
+              <div className="mt-3 h-2 bg-white/20 rounded-full overflow-hidden">
+                <div className="h-full w-3/4 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full"></div>
               </div>
             </div>
-            {vehicleData.length > 0 ? (
-              <div className="flex items-center justify-between">
-                <div className="w-1/2">
-                  <ResponsiveContainer width="100%" height={250}>
-                    <PieChart>
-                      <Pie
-                        data={pieData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        contentStyle={{
-                          backgroundColor: 'white',
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '12px',
-                          boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="w-1/2 pl-4">
-                  <div className="space-y-3">
-                    {vehicleData.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.fill }}></div>
-                          <div className="flex items-center space-x-2">
-                            {getVehicleIcon(item.vehicle)}
-                            <span className="text-sm font-medium text-gray-700 capitalize">{item.vehicle}</span>
-                          </div>
-                        </div>
-                        <span className="text-sm font-bold text-gray-900">{item.emissions}kg</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Car className="w-8 h-8 text-gray-400" />
-                </div>
-                <p className="text-gray-500 text-lg font-medium">No vehicle data</p>
-                <p className="text-gray-400 text-sm mt-1">Start tracking different transport types!</p>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Suggestions and Badges Section */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          {/* AI Suggestions */}
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300">
+        {/* Bottom Grid */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Vehicle Breakdown */}
+          <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
             <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">AI Suggestions</h2>
-                <p className="text-gray-600 text-sm">Personalized recommendations</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
-                <Lightbulb className="w-6 h-6 text-white" />
+              <h3 className="text-xl font-bold text-gray-900">By Transport</h3>
+              <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                <Car className="w-5 h-5 text-purple-600" />
               </div>
             </div>
-            <div className="space-y-4">
-              {suggestions.length > 0 ? (
-                suggestions.map((suggestion, index) => (
-                  <div
-                    key={index}
-                    className={`group p-4 rounded-xl border-l-4 transition-all duration-200 hover:shadow-md ${
-                      suggestion.priority === 'high'
-                        ? 'border-red-500 bg-gradient-to-r from-red-50 to-pink-50 hover:from-red-100 hover:to-pink-100'
-                        : suggestion.priority === 'medium'
-                        ? 'border-yellow-500 bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100'
-                        : 'border-green-500 bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-800 mb-2 group-hover:text-gray-900 transition-colors">
-                          {suggestion.title}
-                        </h3>
-                        <p className="text-sm text-gray-600 leading-relaxed">{suggestion.description}</p>
+            {vehicleData.length > 0 ? (
+              <div className="space-y-4">
+                {vehicleData.map((item, i) => {
+                  const IconComponent = VEHICLE_CONFIG[item.vehicle.toLowerCase() as keyof typeof VEHICLE_CONFIG]?.icon || Car;
+                  const percentage = ((item.emissions / parseFloat(stats?.totalEmissions || '1')) * 100).toFixed(0);
+                  return (
+                    <div key={i} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${item.fill}20` }}>
+                            <IconComponent className="w-5 h-5" style={{ color: item.fill }} />
+                          </div>
+                          <span className="text-gray-700 font-medium capitalize">{item.vehicle.replace('_', ' ')}</span>
+                        </div>
+                        <span className="text-gray-900 font-bold">{item.emissions}kg</span>
                       </div>
-                      <div className={`ml-3 px-2 py-1 rounded-full text-xs font-medium ${
-                        suggestion.priority === 'high'
-                          ? 'bg-red-100 text-red-700'
-                          : suggestion.priority === 'medium'
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : 'bg-green-100 text-green-700'
-                      }`}>
-                        {suggestion.priority}
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all" style={{ width: `${percentage}%`, backgroundColor: item.fill }}></div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <EmptyState icon={Car} message="No data" subtext="Start tracking vehicles" />
+            )}
+          </div>
+
+          {/* AI Suggestions */}
+          <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900">AI Tips</h3>
+              <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
+                <Lightbulb className="w-5 h-5 text-yellow-600" />
+              </div>
+            </div>
+            <div className="space-y-3">
+              {suggestions.length > 0 ? (
+                suggestions.slice(0, 3).map((s, i) => (
+                  <div key={i} className="p-4 bg-gradient-to-r from-gray-50 to-white rounded-2xl border border-gray-100 hover:shadow-md transition-all cursor-pointer">
+                    <div className="flex items-start gap-3">
+                      <div className={`w-2 h-2 rounded-full mt-2 ${
+                        s.priority === 'high' ? 'bg-red-500' : s.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                      }`}></div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900 text-sm mb-1">{s.title}</h4>
+                        <p className="text-xs text-gray-600 leading-relaxed">{s.description}</p>
                       </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Lightbulb className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <p className="text-gray-500 text-lg font-medium">No suggestions yet</p>
-                  <p className="text-gray-400 text-sm mt-1">Complete more trips to get personalized tips!</p>
-                </div>
+                <EmptyState icon={Lightbulb} message="No tips yet" subtext="Complete more trips" />
               )}
             </div>
           </div>
 
-          {/* Badges Section */}
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300">
+          {/* Recent Badges */}
+          <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
             <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">Your Badges</h2>
-                <p className="text-gray-600 text-sm">Achievements unlocked</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center">
-                <Award className="w-6 h-6 text-white" />
+              <h3 className="text-xl font-bold text-gray-900">Achievements</h3>
+              <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                <Award className="w-5 h-5 text-amber-600" />
               </div>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {badges.length > 0 ? (
-                badges.map((badge, index) => (
-                  <div key={index} className="group p-4 bg-gradient-to-r from-yellow-50 via-amber-50 to-orange-50 rounded-xl border border-yellow-200 hover:shadow-md transition-all duration-200">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
+                badges.slice(0, 3).map((b, i) => (
+                  <div key={i} className="p-4 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-2xl border border-amber-100 hover:shadow-md transition-all cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
                         <Award className="w-6 h-6 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-gray-800 mb-1 group-hover:text-gray-900 transition-colors">
-                          {badge.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 mb-2 leading-relaxed">{badge.description}</p>
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs text-gray-500">
-                            Earned on {new Date(badge.dateEarned).toLocaleDateString()}
-                          </p>
-                          <div className="flex items-center space-x-1 text-xs text-green-600 font-medium">
-                            <Leaf className="w-3 h-3" />
-                            <span>-{badge.emissionReduction}kg CO₂</span>
-                          </div>
-                        </div>
+                        <h4 className="font-bold text-gray-900 text-sm truncate">{b.name}</h4>
+                        <p className="text-xs text-gray-600 flex items-center gap-1 mt-1">
+                          <Leaf className="w-3 h-3 text-green-600" />
+                          <span className="text-green-600 font-medium">-{b.emissionReduction}kg CO₂</span>
+                        </p>
                       </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Award className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <p className="text-gray-500 text-lg font-medium">No badges yet</p>
-                  <p className="text-gray-400 text-sm mt-1">Start tracking to earn your first achievement!</p>
-                </div>
+                <EmptyState icon={Award} message="No badges" subtext="Start earning achievements" />
               )}
             </div>
           </div>
@@ -425,41 +369,39 @@ export const Dashboard = () => {
   );
 };
 
-const StatCard = ({ icon, title, value, subtitle, color, trend, trendUp }: {
-  icon: React.ReactNode;
-  title: string;
-  value: string;
-  subtitle?: string;
-  color: string;
-  trend?: string;
-  trendUp?: boolean;
-}) => (
-  <div className="group bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+const StatCard = ({ icon: Icon, label, value, unit, gradient, trend, trendUp }: any) => (
+  <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100 hover:shadow-xl transition-all group">
     <div className="flex items-center justify-between mb-4">
-      <div className={`bg-gradient-to-r ${color} text-white p-3 rounded-xl inline-block group-hover:scale-110 transition-transform duration-200`}>
-        {icon}
+      <div className={`w-12 h-12 bg-gradient-to-br ${gradient} rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
+        <Icon className="w-6 h-6 text-white" />
       </div>
       {trend && (
-        <div className={`flex items-center space-x-1 text-sm font-medium ${
-          trendUp ? 'text-green-600' : 'text-red-600'
-        }`}>
-          {trendUp ? (
-            <TrendingDown className="w-4 h-4 rotate-180" />
-          ) : (
-            <TrendingDown className="w-4 h-4" />
-          )}
-          <span>{trend}</span>
-        </div>
+        <span className={`text-xs font-semibold px-2 py-1 rounded-lg ${trendUp ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          {trend}
+        </span>
       )}
     </div>
-    <div>
-      <h3 className="text-sm font-medium text-gray-600 mb-1">{title}</h3>
-      {subtitle && (
-        <p className="text-xs text-gray-500 mb-2">{subtitle}</p>
-      )}
-      <div className="text-3xl font-bold text-gray-900 group-hover:text-gray-800 transition-colors">
-        {value}
-      </div>
+    <p className="text-gray-600 text-sm font-medium mb-1">{label}</p>
+    <div className="flex items-baseline gap-2">
+      <h3 className="text-3xl font-bold text-gray-900">{value}</h3>
+      <span className="text-gray-500 text-sm">{unit}</span>
     </div>
+  </div>
+);
+
+const ActionButton = ({ icon: Icon, label, gradient }: any) => (
+  <button className={`w-full p-4 bg-gradient-to-r ${gradient} rounded-2xl text-white font-medium hover:shadow-lg transition-all hover:scale-105 flex items-center justify-between group`}>
+    <span>{label}</span>
+    <Icon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+  </button>
+);
+
+const EmptyState = ({ icon: Icon, message, subtext }: any) => (
+  <div className="flex flex-col items-center justify-center py-8 text-center">
+    <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-3">
+      <Icon className="w-7 h-7 text-gray-400" />
+    </div>
+    <p className="text-gray-500 font-medium text-sm">{message}</p>
+    {subtext && <p className="text-gray-400 text-xs mt-1">{subtext}</p>}
   </div>
 );
