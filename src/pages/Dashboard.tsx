@@ -247,7 +247,7 @@ export const Dashboard = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 text-white shadow-xl">
+          <div className="bg-gradient-to-br from-teal-800 to-green-700 rounded-3xl p-6 text-white shadow-xl">
             <h3 className="text-xl font-bold mb-6">Quick Actions</h3>
             <div className="space-y-3">
               <ActionButton icon={Car} label="Calculate Trip" gradient="from-emerald-400 to-teal-500" />
