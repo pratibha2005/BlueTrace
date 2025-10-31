@@ -1,4 +1,3 @@
-// src/pages/calculator.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calculator as CalcIcon, Car, Bike, Bus, Truck, Zap } from 'lucide-react';
@@ -6,21 +5,20 @@ import { calculatorAPI, badgeAPI, authAPI } from '../services/api';
 import { ReactComponent as EcoLeaf } from '../assets/svgs/eco-leaf.svg';
 import { ReactComponent as EcoCar } from '../assets/svgs/eco-car.svg';
 
-
-
 export const Calculator = () => {
   const [vehicleType, setVehicleType] = useState('car');
   const [fuelType, setFuelType] = useState('petrol');
   const [fuelConsumption, setFuelConsumption] = useState('');
   const [distance, setDistance] = useState('');
   const [result, setResult] = useState<number | null>(null);
+  const [aiSuggestion, setAiSuggestion] = useState(''); // 🧠 AI suggestions
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const vehicleTypes = [
     { value: 'car', label: 'Car', icon: Car },
-    { value: 'bike', label: 'bike', icon: Bike },
+    { value: 'bike', label: 'Bike', icon: Bike },
     { value: 'scooter', label: 'Scooter', icon: Bike },
     { value: 'bus', label: 'Bus', icon: Bus },
     { value: 'truck', label: 'Truck', icon: Truck },
@@ -36,57 +34,61 @@ export const Calculator = () => {
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError('');
-  setLoading(true);
-  
-  try {
-    // Check authentication first
-    if (!authAPI.isAuthenticated()) {
-      setError('Please log in to calculate emissions');
-      navigate('/login');
-      return;
-    }
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    setAiSuggestion('');
 
-    const data = await calculatorAPI.calculate({
-      vehicleType,
-      fuelType,
-      fuelConsumption: parseFloat(fuelConsumption),
-      distance: parseFloat(distance)
-    });
-
-    setResult(data.co2Emissions);
-    
-    // Check for new badges
     try {
-      await badgeAPI.checkBadges();
-    } catch (badgeError) {
-      console.log('Badge check failed:', badgeError);
-    }
+      // Check authentication first
+      if (!authAPI.isAuthenticated()) {
+        setError('Please log in to calculate emissions');
+        navigate('/login');
+        return;
+      }
 
-    // Store recent calculation
-    try {
-      sessionStorage.setItem('recentCalc', JSON.stringify({
-        co2Emissions: data.co2Emissions,
+      const data = await calculatorAPI.calculate({
         vehicleType,
-        date: new Date().toISOString()
-      }));
-    } catch {}
+        fuelType,
+        fuelConsumption: parseFloat(fuelConsumption),
+        distance: parseFloat(distance)
+      });
 
-    // Navigate to dashboard
-    navigate('/dashboard');
-    
-  } catch (err: any) {
-    console.error('Calculation error:', err);
-    setError(err.message || 'Failed to calculate emissions');
-  } finally {
-    setLoading(false);
-  }
-};
+      setResult(data.co2Emissions);
+
+      // 🧠 Store AI suggestion if available
+      if (data.aiSuggestions) {
+        setAiSuggestion(data.aiSuggestions);
+      }
+
+      // Check for new badges
+      try {
+        await badgeAPI.checkBadges();
+      } catch (badgeError) {
+        console.log('Badge check failed:', badgeError);
+      }
+
+      // Store recent calculation
+      try {
+        sessionStorage.setItem('recentCalc', JSON.stringify({
+          co2Emissions: data.co2Emissions,
+          vehicleType,
+          date: new Date().toISOString()
+        }));
+      } catch {}
+
+    } catch (err: any) {
+      console.error('Calculation error:', err);
+      setError(err.message || 'Failed to calculate emissions');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white py-12 px-4">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        
         {/* Left - Form card */}
         <div className="bg-white rounded-3xl shadow-xl p-8">
           <div className="flex items-center gap-4 mb-6">
@@ -147,14 +149,14 @@ export const Calculator = () => {
 
             <div className="flex gap-4">
               <button type="submit" disabled={loading} className="flex-1 bg-emerald-500 text-white py-3 rounded-2xl font-semibold hover:bg-emerald-600 transition disabled:opacity-50">
-                {loading ? 'Calculating...' : 'Calculate & View Dashboard'}
+                {loading ? 'Calculating...' : 'Calculate'}
               </button>
-              <button type="button" onClick={() => { setFuelConsumption(''); setDistance(''); setError(''); }} className="px-6 py-3 rounded-2xl border border-gray-200 bg-white">Reset</button>
+              <button type="button" onClick={() => { setFuelConsumption(''); setDistance(''); setError(''); setAiSuggestion(''); }} className="px-6 py-3 rounded-2xl border border-gray-200 bg-white">Reset</button>
             </div>
           </form>
         </div>
 
-        {/* Right - Illustration + result card */}
+        {/* Right - Results & AI suggestions */}
         <div className="bg-gradient-to-br from-emerald-50 to-white rounded-3xl p-8 flex flex-col items-center justify-center shadow-md">
           <div className="w-full max-w-md">
             <div className="flex items-center justify-between mb-6">
@@ -181,13 +183,23 @@ export const Calculator = () => {
                 <div className="text-center">
                   <div className="text-4xl font-bold text-emerald-600">{result} <span className="text-sm font-medium text-gray-600">kg CO₂</span></div>
                   <p className="mt-2 text-sm text-gray-600">Estimated emissions for this trip</p>
+
+                  {/* 🧠 AI Suggestion Card */}
+                  {aiSuggestion && (
+                    <div className="mt-6 bg-emerald-50 border border-emerald-200 rounded-2xl p-4 shadow-sm text-gray-700 text-sm">
+                      <p className="font-semibold text-emerald-700 mb-1">🌿 Eco Tip for You</p>
+                      <p>{aiSuggestion}</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
 
-                        <div className="mt-6 text-xs text-gray-500">
-              Tip: Small changes like reducing speed or carpooling can reduce emissions.
-            </div>
+            {!aiSuggestion && (
+              <div className="mt-6 text-xs text-gray-500">
+                Tip: Small changes like reducing speed or carpooling can reduce emissions.
+              </div>
+            )}
           </div>
         </div>
       </div>
