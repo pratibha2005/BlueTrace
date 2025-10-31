@@ -10,7 +10,11 @@ router.post('/', auth, async (req, res) => {
   try {
     const { vehicleType, fuelType, fuelConsumption, distance } = req.body;
 
+    console.log('Incoming data:', { vehicleType, fuelType, fuelConsumption, distance });
+    console.log('User ID:', req.userId);
+
     const co2Emissions = calculateEmissions(vehicleType, fuelType, fuelConsumption, distance);
+    console.log('Calculated Emission:', co2Emissions);
 
     const emission = new Emission({
       userId: req.userId,
@@ -22,19 +26,23 @@ router.post('/', auth, async (req, res) => {
     });
 
     await emission.save();
+    console.log('Emission saved successfully');
 
     await User.findByIdAndUpdate(req.userId, {
       $inc: { totalEmissionsCalculated: parseFloat(co2Emissions) }
     });
+    console.log('User updated successfully');
 
     res.status(201).json({
       emission,
       co2Emissions: parseFloat(co2Emissions)
     });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Server error in /calculate:', error.message);
+    res.status(500).json({ error: error.message });
   }
 });
+
 
 router.get('/history', auth, async (req, res) => {
   try {

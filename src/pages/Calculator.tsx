@@ -20,7 +20,7 @@ export const Calculator = () => {
 
   const vehicleTypes = [
     { value: 'car', label: 'Car', icon: Car },
-    { value: 'motorcycle', label: 'Motorcycle', icon: Bike },
+    { value: 'bike', label: 'bike', icon: Bike },
     { value: 'scooter', label: 'Scooter', icon: Bike },
     { value: 'bus', label: 'Bus', icon: Bus },
     { value: 'truck', label: 'Truck', icon: Truck },
