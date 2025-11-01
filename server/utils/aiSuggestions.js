@@ -1,47 +1,31 @@
-// utils/aiSuggestions.js
+// utils/aiSuggestions.js (CommonJS version)
 const OpenAI = require("openai");
 
-// Initialize OpenAI client using your environment variable
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+const client = new OpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
 });
 
-/**
- * Generate AI suggestions based on emission data
- */
 async function getAISuggestions({ totalEmissions, vehicleType }) {
-  // Default fallback suggestion
-  let suggestion =
-    "Try carpooling, maintaining your vehicle regularly, and avoiding unnecessary trips to reduce emissions.";
-
   try {
-    // Build prompt for OpenAI
-    const prompt = `
-You are an eco-awareness assistant. 
-A user just generated ${Number(totalEmissions).toFixed(2)} kg of CO₂ using a ${vehicleType}.
-Provide 2-3 practical and friendly tips to reduce carbon emissions for future trips.
-Keep the tone short, positive, and actionable.
-`;
+    console.log("🧠 Generating AI suggestion for:", totalEmissions, vehicleType);
 
-    const response = await openai.chat.completions.create({
+    const prompt = `Suggest eco-friendly actions for ${Number(totalEmissions).toFixed(2)} kg CO2 emissions ...`;
+
+    const response = await client.chat.completions.create({
       model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: "You are a helpful environmental assistant." },
-        { role: "user", content: prompt },
-      ],
-      max_tokens: 80,
-      temperature: 0.7,
+      messages: [{ role: "user", content: prompt }],
     });
 
-    // Extract the AI's suggestion
-    const aiMessage = response.choices?.[0]?.message?.content?.trim();
+    const message = response.choices?.[0]?.message?.content || 
+      "Try carpooling, maintaining your vehicle regularly, and avoiding unnecessary trips to reduce emissions.";
 
-    if (aiMessage) suggestion = aiMessage;
+    return message;
+
   } catch (error) {
     console.error("AI suggestion error:", error.message);
+    return "Could not generate suggestions right now. Please try again later.";
   }
-
-  return suggestion;
 }
 
 module.exports = { getAISuggestions };
