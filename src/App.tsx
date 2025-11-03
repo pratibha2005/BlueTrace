@@ -5,7 +5,7 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { Calculator } from './pages/Calculator';
-import { Dashboard } from './pages/Dashboard';
+ import { Dashboard } from './pages/Dashboard';
 import { Awareness } from './pages/Awareness';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
