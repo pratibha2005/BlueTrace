@@ -12,6 +12,21 @@
  /* Sabse pehle @import statements */
 @import url('https://fonts.googleapis.com/css2?family=Licorice&display=swap');
 
+
+
+/* index.css or global stylesheet */
+.wavy-sidebar-bg {
+  /* White background par halka sa light-purple shade */
+  background-color: #f7f6ff; 
+}
+
+.wavy-active-link {
+  background-color: #5533FF; /* Apka dark purple colour */
+  /* Ye clip-path ki values shape par depend karengi, ye sirf example hai */
+  clip-path: polygon(0% 0%, 100% 10%, 100% 90%, 0% 100%); 
+}
+/* NOTE: Actual wavy shape ke liye aapko complex clip-path coordinates ya SVG banana padega. */
+
 /* Uske baad Tailwind directives */
 @tailwind base;
 @tailwind components;
