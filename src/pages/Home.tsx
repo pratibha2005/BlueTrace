@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Lottie from "lottie-react";
 import Homesvg from "../assets/animations/Homesvg.json";
+
+//import icons
 import {
   Car,
   TrendingDown,
