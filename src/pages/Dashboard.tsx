@@ -7,7 +7,6 @@ import { Dashboard as DashboardContent } from "../pages/DashboardContent"; // re
 export const Dashboard = () => {
     const [stats, setStats] = useState<any>(null);
   const [activeSection, setActiveSection] = useState("overview");
-
   return (
     <div className="flex bg-gray-50 min-h-screen">
       <Sidebar active={activeSection} onSelect={setActiveSection} />
