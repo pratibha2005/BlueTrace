@@ -1,31 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "../components/Sidebar";
 import { ProfilePanel } from "../components/ProfilePanel";
 import { motion, AnimatePresence } from "framer-motion";
-import { Dashboard as DashboardContent } from "../pages/DashboardContent"; // rename your current dashboard code to this file later
+import { DashboardContent } from "../pages/DashboardContent";
+import { calculatorAPI } from "../services/api";
 
 export const Dashboard = () => {
-    const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<any>(null);
   const [activeSection, setActiveSection] = useState("overview");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    calculatorAPI.getStats()
+      .then(data => setStats(data))
+      .catch(err => console.error('Failed to fetch stats:', err))
+      .finally(() => setIsLoading(false));
+  }, []);
+
   return (
-    <div className="flex bg-gray-50 min-h-screen">
+    <div className="flex bg-gradient-to-br from-slate-50 via-blue-50/30 to-emerald-50/20 h-screen overflow-hidden">
+      
       <Sidebar active={activeSection} onSelect={setActiveSection} />
 
-      <main className="flex-1 p-6 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeSection}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.98 }}
+            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            className="h-full"
           >
-            <DashboardContent />
+            <DashboardContent active={activeSection} />
           </motion.div>
         </AnimatePresence>
       </main>
 
-      <ProfilePanel stats={stats} />
+      <ProfilePanel stats={stats} isLoading={isLoading} />
 
     </div>
   );
