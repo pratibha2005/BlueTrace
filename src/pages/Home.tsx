@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 // --- Reusable Stat Card ---
+
 const StatCard = ({ number, label }) => (
   <div className="text-center p-4">
     <div className="text-5xl font-extrabold text-green-600 mb-2">{number}</div>
@@ -375,9 +376,4 @@ export const Home = () => {
   );
 };
 
-
-
-
-
-
-// push code by prtibha 
+//abc
