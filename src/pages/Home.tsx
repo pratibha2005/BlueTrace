@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Lottie from "lottie-react";
 import Homesvg from "../assets/animations/Homesvg.json";
+import Squares from '../ReactBits/HomeSquares';
 
 //import icons
 import {
@@ -338,10 +339,23 @@ export const Home = () => {
 
           {/* Bottom Glow Line */} 
 
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent opacity-50"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-green-100 to-transparent opacity-50 
+         
+          ">
+          
+          </div>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-2xl p-10 mb-20 border-t-4 border-green-500">
+        <div className=" rounded-2xl shadow-2xl p-10 mb-20 border-t-1  relative overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <Squares 
+    speed={0.5}
+    squareSize={40}
+    direction="diagonal"
+    borderColor="#236e37ff"
+    hoverFillColor="#2b7447ff"
+  />
+  </div>
           <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
             Why BlueTrace Matters
           </h2>
@@ -377,3 +391,4 @@ export const Home = () => {
 };
 
 //abc
+//pratibhaaaaaaaaaaa
