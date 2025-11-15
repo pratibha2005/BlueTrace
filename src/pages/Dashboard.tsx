@@ -18,7 +18,7 @@ export const Dashboard = () => {
   }, []);
 
   return (
-    <div className="flex bg-gradient-to-br from-slate-50 via-blue-50/30 to-emerald-50/20 h-screen overflow-hidden">
+    <div className="flex bg-gray-50 h-screen overflow-hidden">
       
       <Sidebar active={activeSection} onSelect={setActiveSection} />
 
@@ -26,10 +26,10 @@ export const Dashboard = () => {
         <AnimatePresence mode="wait">
           <motion.div
             key={activeSection}
-            initial={{ opacity: 0, y: 20, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.98 }}
-            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
             className="h-full"
           >
             <DashboardContent active={activeSection} />
