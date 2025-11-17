@@ -8,6 +8,7 @@ const calculateRoutes = require('./routes/calculate');
 const suggestionsRoutes = require('./routes/suggestions');
 const badgeRoutes = require('./routes/badge');
 const awarenessRoutes = require('./routes/awareness');
+const aiVideoRoutes = require('./routes/aiVideo');
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/api/calculate', calculateRoutes);
 app.use('/api/suggestions', suggestionsRoutes);
 app.use('/api/badge', badgeRoutes);
 app.use('/api/awareness', awarenessRoutes);
+app.use('/api/ai-video', aiVideoRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'BlueTrace API is running' });

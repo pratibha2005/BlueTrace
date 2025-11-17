@@ -144,3 +144,18 @@ export const awarenessAPI = {
     return handleResponse(response);
   }
 };
+
+export const aiVideoAPI = {
+  generateVideo: async (data: {
+    topic: string;
+    topicDescription: string;
+    language: string;
+  }) => {
+    const response = await fetch(`${API_BASE_URL}/ai-video/generate`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    return handleResponse(response);
+  }
+};
