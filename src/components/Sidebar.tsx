@@ -111,3 +111,5 @@ export const Sidebar = ({ active, onSelect }: SidebarProps) => {
     </motion.div>
   );
 };
+
+// Side bar intehgerandga
