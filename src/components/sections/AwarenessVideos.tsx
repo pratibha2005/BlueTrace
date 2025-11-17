@@ -95,7 +95,7 @@ export const AwarenessVideos = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentScene, setCurrentScene] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [useElevenLabs, setUseElevenLabs] = useState(true);
+  const [useElevenLabs, setUseElevenLabs] = useState(true); // Re-enabled with new API key
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const speechSynthRef = useRef<SpeechSynthesisUtterance | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -331,24 +331,55 @@ export const AwarenessVideos = () => {
         
         // Language code mapping
         const langCodes: Record<string, string[]> = {
+          // Indian Languages (22 Official)
           'hindi': ['hi-IN', 'hi'],
           'marathi': ['mr-IN', 'mr'],
           'odia': ['or-IN', 'or'],
+          'oriya': ['or-IN', 'or'],
           'tamil': ['ta-IN', 'ta'],
           'telugu': ['te-IN', 'te'],
           'bengali': ['bn-IN', 'bn'],
+          'bangla': ['bn-IN', 'bn'],
           'gujarati': ['gu-IN', 'gu'],
           'kannada': ['kn-IN', 'kn'],
           'malayalam': ['ml-IN', 'ml'],
           'punjabi': ['pa-IN', 'pa'],
+          'urdu': ['ur-PK', 'ur-IN', 'ur'],
+          'assamese': ['as-IN', 'as'],
+          'kashmiri': ['ks-IN', 'ks'],
+          'konkani': ['kok-IN', 'kok'],
+          'manipuri': ['mni-IN', 'mni'],
+          'nepali': ['ne-NP', 'ne-IN', 'ne'],
+          'sanskrit': ['sa-IN', 'sa'],
+          'sindhi': ['sd-IN', 'sd'],
+          'bodo': ['brx-IN', 'brx'],
+          'dogri': ['doi-IN', 'doi'],
+          'maithili': ['mai-IN', 'mai'],
+          'santali': ['sat-IN', 'sat'],
+          // Major World Languages
           'english': ['en-IN', 'en-US', 'en-GB', 'en'],
-          'spanish': ['es-ES', 'es'],
-          'french': ['fr-FR', 'fr'],
+          'spanish': ['es-ES', 'es-MX', 'es'],
+          'french': ['fr-FR', 'fr-CA', 'fr'],
           'german': ['de-DE', 'de'],
-          'chinese': ['zh-CN', 'zh'],
-          'arabic': ['ar-SA', 'ar'],
+          'italian': ['it-IT', 'it'],
+          'portuguese': ['pt-BR', 'pt-PT', 'pt'],
+          'chinese': ['zh-CN', 'zh-TW', 'zh'],
+          'mandarin': ['zh-CN', 'zh'],
+          'arabic': ['ar-SA', 'ar-AE', 'ar'],
           'japanese': ['ja-JP', 'ja'],
-          'korean': ['ko-KR', 'ko']
+          'korean': ['ko-KR', 'ko'],
+          'russian': ['ru-RU', 'ru'],
+          'turkish': ['tr-TR', 'tr'],
+          'polish': ['pl-PL', 'pl'],
+          'dutch': ['nl-NL', 'nl'],
+          'swedish': ['sv-SE', 'sv'],
+          'ukrainian': ['uk-UA', 'uk'],
+          'czech': ['cs-CZ', 'cs'],
+          'filipino': ['fil-PH', 'fil'],
+          'indonesian': ['id-ID', 'id'],
+          'malay': ['ms-MY', 'ms'],
+          'vietnamese': ['vi-VN', 'vi'],
+          'thai': ['th-TH', 'th']
         };
         
         // Find matching voice
@@ -517,7 +548,7 @@ export const AwarenessVideos = () => {
       }
     }, 100);
     
-    // Auto-advance scenes (10 seconds each)
+    // Auto-advance scenes (8 seconds each)
     let sceneIndex = 0;
     intervalRef.current = setInterval(() => {
       sceneIndex++;
@@ -526,7 +557,7 @@ export const AwarenessVideos = () => {
       } else {
         setCurrentScene(sceneIndex);
       }
-    }, 10000);
+    }, 8000);
   };
 
   // Romanize text for languages without available voices
@@ -1244,7 +1275,8 @@ export const AwarenessVideos = () => {
                         <ul className="list-disc ml-5 mt-2 space-y-1">
                           <li><strong>Groq AI (FREE)</strong> - Generates educational content in <strong>{selectedVideo.language}</strong></li>
                           <li><strong>ElevenLabs (Premium)</strong> - Natural, human-like text-to-speech with Eleven Multilingual v2 model</li>
-                          <li>Perfect pronunciation in Hindi, Marathi, Tamil, Telugu, Bengali, and 25+ languages</li>
+                          <li>Supports ALL Indian languages: Hindi, Tamil, Telugu, Malayalam, Kannada, Bengali, Marathi, Gujarati, Punjabi, Odia, Urdu, Assamese, and more!</li>
+                          <li>Also supports 29+ world languages with perfect native pronunciation</li>
                           <li>Realistic voice quality that sounds like a real person speaking</li>
                         </ul>
                         <p className="mt-2 text-xs text-purple-700 font-semibold">

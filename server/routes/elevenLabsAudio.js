@@ -30,20 +30,57 @@ router.post('/generate-audio', async (req, res) => {
     console.log('Text length:', text.length, 'characters');
 
     // Map language to ElevenLabs voice ID
-    // You can get these from: https://api.elevenlabs.io/v1/voices
+    // Using Eleven Multilingual v2 model which supports 29+ languages
     const voiceMap = {
-      'hindi': 'pFZP5JQG7iQjIQuC4Bku', // Multilingual voice
+      // Indian Languages - All use multilingual voice for best results
+      'hindi': 'pFZP5JQG7iQjIQuC4Bku',
       'marathi': 'pFZP5JQG7iQjIQuC4Bku',
       'odia': 'pFZP5JQG7iQjIQuC4Bku',
+      'oriya': 'pFZP5JQG7iQjIQuC4Bku',
       'tamil': 'pFZP5JQG7iQjIQuC4Bku',
       'telugu': 'pFZP5JQG7iQjIQuC4Bku',
       'bengali': 'pFZP5JQG7iQjIQuC4Bku',
+      'bangla': 'pFZP5JQG7iQjIQuC4Bku',
+      'gujarati': 'pFZP5JQG7iQjIQuC4Bku',
+      'kannada': 'pFZP5JQG7iQjIQuC4Bku',
+      'malayalam': 'pFZP5JQG7iQjIQuC4Bku',
+      'punjabi': 'pFZP5JQG7iQjIQuC4Bku',
+      'urdu': 'pFZP5JQG7iQjIQuC4Bku',
+      'assamese': 'pFZP5JQG7iQjIQuC4Bku',
+      'kashmiri': 'pFZP5JQG7iQjIQuC4Bku',
+      'konkani': 'pFZP5JQG7iQjIQuC4Bku',
+      'manipuri': 'pFZP5JQG7iQjIQuC4Bku',
+      'nepali': 'pFZP5JQG7iQjIQuC4Bku',
+      'sanskrit': 'pFZP5JQG7iQjIQuC4Bku',
+      'sindhi': 'pFZP5JQG7iQjIQuC4Bku',
+      'bodo': 'pFZP5JQG7iQjIQuC4Bku',
+      'dogri': 'pFZP5JQG7iQjIQuC4Bku',
+      'maithili': 'pFZP5JQG7iQjIQuC4Bku',
+      'santali': 'pFZP5JQG7iQjIQuC4Bku',
+      // Major World Languages
       'english': 'pNInz6obpgDQGcFmaJgB', // Adam voice
       'spanish': 'pFZP5JQG7iQjIQuC4Bku',
       'french': 'pFZP5JQG7iQjIQuC4Bku',
       'german': 'pFZP5JQG7iQjIQuC4Bku',
       'italian': 'pFZP5JQG7iQjIQuC4Bku',
-      'portuguese': 'pFZP5JQG7iQjIQuC4Bku'
+      'portuguese': 'pFZP5JQG7iQjIQuC4Bku',
+      'arabic': 'pFZP5JQG7iQjIQuC4Bku',
+      'chinese': 'pFZP5JQG7iQjIQuC4Bku',
+      'mandarin': 'pFZP5JQG7iQjIQuC4Bku',
+      'japanese': 'pFZP5JQG7iQjIQuC4Bku',
+      'korean': 'pFZP5JQG7iQjIQuC4Bku',
+      'russian': 'pFZP5JQG7iQjIQuC4Bku',
+      'turkish': 'pFZP5JQG7iQjIQuC4Bku',
+      'polish': 'pFZP5JQG7iQjIQuC4Bku',
+      'dutch': 'pFZP5JQG7iQjIQuC4Bku',
+      'swedish': 'pFZP5JQG7iQjIQuC4Bku',
+      'ukrainian': 'pFZP5JQG7iQjIQuC4Bku',
+      'czech': 'pFZP5JQG7iQjIQuC4Bku',
+      'filipino': 'pFZP5JQG7iQjIQuC4Bku',
+      'indonesian': 'pFZP5JQG7iQjIQuC4Bku',
+      'malay': 'pFZP5JQG7iQjIQuC4Bku',
+      'vietnamese': 'pFZP5JQG7iQjIQuC4Bku',
+      'thai': 'pFZP5JQG7iQjIQuC4Bku'
     };
 
     const targetLang = language.toLowerCase();

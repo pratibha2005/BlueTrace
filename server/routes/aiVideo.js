@@ -54,18 +54,26 @@ router.post('/generate', async (req, res) => {
       try {
         console.log('Generating script with Groq AI...');
         // Check if language needs romanization for TTS
-        const needsRomanization = ['hindi', 'marathi', 'odia', 'tamil', 'telugu', 'bengali', 'gujarati', 'kannada', 'malayalam', 'punjabi', 'urdu', 'arabic', 'chinese', 'japanese', 'korean', 'thai'].some(lang => 
-          language.toLowerCase().includes(lang)
-        );
+        // All Indian languages + major world languages that use non-Latin scripts
+        const needsRomanization = [
+          // Indian Languages (22 Official + others)
+          'hindi', 'marathi', 'odia', 'oriya', 'tamil', 'telugu', 'bengali', 'bangla',
+          'gujarati', 'kannada', 'malayalam', 'punjabi', 'urdu', 'assamese', 'kashmiri',
+          'konkani', 'manipuri', 'nepali', 'sanskrit', 'sindhi', 'bodo', 'dogri',
+          'maithili', 'santali', 'tulu', 'khasi', 'garo', 'mizo', 'bhojpuri',
+          // Major World Languages
+          'arabic', 'chinese', 'mandarin', 'cantonese', 'japanese', 'korean', 
+          'thai', 'persian', 'hebrew', 'greek', 'russian', 'ukrainian', 'armenian',
+          'georgian', 'burmese', 'khmer', 'lao', 'tibetan', 'mongolian', 'amharic'
+        ].some(lang => language.toLowerCase().includes(lang));
 
         const scriptPrompt = needsRomanization 
           ? `Create an engaging educational script about "${topic}" (${topicDescription}) in ${language} language.
 
 The script should:
-- Be 4-5 minutes long when spoken (approximately 600-750 words)
-- Explain carbon emissions and sustainability concepts clearly with detailed examples
-- Include practical examples, statistics, and actionable tips
-- Cover multiple aspects: causes, effects, solutions, and individual actions
+- Be 2 minutes long when spoken (approximately 300-350 words)
+- Explain carbon emissions and sustainability concepts clearly
+- Include practical examples and actionable tips
 - Use simple, conversational language that engages the audience
 
 IMPORTANT: Provide TWO versions:
@@ -85,10 +93,9 @@ ROMANIZED: Namaste, aaj hum baat karenge`
           : `Create an engaging educational script about "${topic}" (${topicDescription}) in ${language} language.
 
 The script should:
-- Be 4-5 minutes long when spoken (approximately 600-750 words)
-- Explain carbon emissions and sustainability concepts clearly with detailed examples
-- Include practical examples, statistics, and actionable tips
-- Cover multiple aspects: causes, effects, solutions, and individual actions
+- Be 2 minutes long when spoken (approximately 300-350 words)
+- Explain carbon emissions and sustainability concepts clearly
+- Include practical examples and actionable tips
 - Use simple, conversational language that engages the audience
 
 Provide ONLY the script content, no additional commentary.`;
@@ -303,7 +310,7 @@ function generateVideoScenes(topic, script, language) {
     }
   }
   
-  return sentences.slice(0, 12).map((sentence, index) => {
+  return sentences.slice(0, 6).map((sentence, index) => {
     let animation;
     if (index % 3 === 0) animation = 'fadeIn';
     else if (index % 3 === 1) animation = 'slideUp';
@@ -314,7 +321,7 @@ function generateVideoScenes(topic, script, language) {
       text: sentence.trim(),
       icon: icons[index % icons.length],
       image: images[index % images.length],
-      duration: 10, // seconds per scene for better viewing
+      duration: 8, // seconds per scene
       animation: animation,
       background: `gradient-${(index % 5) + 1}`,
       overlay: index % 2 === 0 ? 'particles' : 'waves'
