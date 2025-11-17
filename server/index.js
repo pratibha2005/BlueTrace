@@ -9,11 +9,12 @@ const suggestionsRoutes = require('./routes/suggestions');
 const badgeRoutes = require('./routes/badge');
 const awarenessRoutes = require('./routes/awareness');
 const aiVideoRoutes = require('./routes/aiVideo');
+const elevenLabsAudioRoutes = require('./routes/elevenLabsAudio');
 
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' })); // Increased limit for audio data
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
@@ -25,6 +26,7 @@ app.use('/api/suggestions', suggestionsRoutes);
 app.use('/api/badge', badgeRoutes);
 app.use('/api/awareness', awarenessRoutes);
 app.use('/api/ai-video', aiVideoRoutes);
+app.use('/api/elevenlabs', elevenLabsAudioRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'BlueTrace API is running' });

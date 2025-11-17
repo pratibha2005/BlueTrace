@@ -14,7 +14,7 @@ import {
   Wand2,
   AlertCircle
 } from 'lucide-react';
-import { aiVideoAPI } from '../../services/api';
+import { aiVideoAPI, elevenLabsAPI } from '../../services/api';
 
 interface VideoScene {
   id: number;
@@ -32,6 +32,7 @@ interface AIVideo {
   topic: string;
   language: string;
   script: string;
+  romanizedScript?: string;
   takeaways: string[];
   duration: number;
   scenes: VideoScene[];
@@ -94,10 +95,42 @@ export const AwarenessVideos = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentScene, setCurrentScene] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [useElevenLabs, setUseElevenLabs] = useState(true);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const speechSynthRef = useRef<SpeechSynthesisUtterance | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const keepAliveRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Keyboard shortcuts for video player
+  useState(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (!selectedVideo) return;
+      
+      switch(e.key) {
+        case ' ':
+        case 'k':
+          e.preventDefault();
+          isPlaying ? stopVideo() : playVideo();
+          break;
+        case 'Escape':
+          stopVideo();
+          setSelectedVideo(null);
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          seekVideo(Math.max(0, progress - 10));
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          seekVideo(Math.min(100, progress + 10));
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  });
 
   const generateVideo = async () => {
     if (!selectedTopic || !userLanguage.trim()) return;
@@ -120,6 +153,7 @@ export const AwarenessVideos = () => {
         topic: response.video.topic,
         language: response.video.language,
         script: response.video.script,
+        romanizedScript: response.video.romanizedScript,
         takeaways: response.video.takeaways,
         scenes: response.video.scenes || [],
         duration: response.video.duration,
@@ -151,8 +185,140 @@ export const AwarenessVideos = () => {
     setCurrentScene(0);
     setProgress(0);
     
-    // Play audio using scenes (scene by scene for better control)
-    if ('speechSynthesis' in window) {
+    // Try ElevenLabs first (best quality)
+    if (useElevenLabs) {
+      console.log('Using ElevenLabs for high-quality audio');
+      
+      // Play scenes one by one with ElevenLabs
+      let currentSceneIndex = 0;
+      
+      const playSceneWithElevenLabs = async () => {
+        if (currentSceneIndex >= selectedVideo.scenes.length) {
+          console.log('All scenes completed');
+          setIsPlaying(false);
+          setCurrentScene(0);
+          setProgress(0);
+          return;
+        }
+        
+        const scene = selectedVideo.scenes[currentSceneIndex];
+        const textToSpeak = scene.text || `Scene ${currentSceneIndex + 1}`;
+        
+        try {
+          console.log(`Generating ElevenLabs audio for scene ${currentSceneIndex + 1}...`);
+          
+          // Generate audio with ElevenLabs
+          const audioData = await elevenLabsAPI.generateAudio(textToSpeak, selectedVideo.language);
+          
+          // Create audio element and play
+          const audio = new Audio(`data:audio/mpeg;base64,${audioData.audio}`);
+          audioRef.current = audio;
+          
+          audio.onended = () => {
+            console.log(`Scene ${currentSceneIndex + 1} audio completed`);
+            currentSceneIndex++;
+            if (currentSceneIndex < selectedVideo.scenes.length) {
+              setTimeout(playSceneWithElevenLabs, 500);
+            } else {
+              setIsPlaying(false);
+              setCurrentScene(0);
+              setProgress(0);
+            }
+          };
+          
+          audio.onerror = (error) => {
+            console.error(`Scene ${currentSceneIndex + 1} audio error:`, error);
+            currentSceneIndex++;
+            if (currentSceneIndex < selectedVideo.scenes.length) {
+              setTimeout(playSceneWithElevenLabs, 500);
+            }
+          };
+          
+          await audio.play();
+          console.log(`Playing scene ${currentSceneIndex + 1} audio`);
+          
+        } catch (error) {
+          console.error('ElevenLabs error:', error);
+          // Fallback to ResponsiveVoice
+          console.log('Falling back to ResponsiveVoice');
+          setUseElevenLabs(false);
+          playVideo(); // Retry with fallback
+          return;
+        }
+      };
+      
+      playSceneWithElevenLabs();
+      
+    } else if (typeof (window as any).responsiveVoice !== 'undefined') {
+      console.log('Using ResponsiveVoice TTS');
+      (window as any).responsiveVoice.cancel();
+      
+      // Map language to ResponsiveVoice voice names
+      const voiceMap: Record<string, string> = {
+        'hindi': 'Hindi Female',
+        'marathi': 'Hindi Female', // Fallback to Hindi
+        'english': 'UK English Female',
+        'spanish': 'Spanish Female',
+        'french': 'French Female',
+        'german': 'Deutsch Female',
+        'italian': 'Italian Female',
+        'portuguese': 'Brazilian Portuguese Female',
+        'russian': 'Russian Female',
+        'japanese': 'Japanese Female',
+        'korean': 'Korean Female',
+        'chinese': 'Chinese Female',
+        'arabic': 'Arabic Female'
+      };
+      
+      const targetLang = selectedVideo.language.toLowerCase();
+      const voiceName = voiceMap[targetLang] || 'UK English Female';
+      
+      console.log(`Using ResponsiveVoice: ${voiceName} for ${selectedVideo.language}`);
+      
+      // Play each scene with ResponsiveVoice
+      let currentSceneIndex = 0;
+      
+      const playSceneAudio = () => {
+        if (currentSceneIndex >= selectedVideo.scenes.length) {
+          console.log('All scenes audio completed');
+          return;
+        }
+        
+        const scene = selectedVideo.scenes[currentSceneIndex];
+        const textToSpeak = scene.text || `Scene ${currentSceneIndex + 1}`;
+        
+        console.log(`Scene ${currentSceneIndex + 1} - Speaking with ResponsiveVoice:`, textToSpeak.substring(0, 50) + '...');
+        
+        (window as any).responsiveVoice.speak(
+          textToSpeak,
+          voiceName,
+          {
+            pitch: 1,
+            rate: 0.9,
+            volume: 1,
+            onend: () => {
+              console.log(`Scene ${currentSceneIndex + 1} audio ended`);
+              currentSceneIndex++;
+              if (currentSceneIndex < selectedVideo.scenes.length) {
+                setTimeout(playSceneAudio, 500);
+              }
+            },
+            onerror: (error: any) => {
+              console.error(`Scene ${currentSceneIndex + 1} audio error:`, error);
+              currentSceneIndex++;
+              if (currentSceneIndex < selectedVideo.scenes.length) {
+                setTimeout(playSceneAudio, 500);
+              }
+            }
+          }
+        );
+      };
+      
+      playSceneAudio();
+      
+    } else {
+      // Fallback to browser speechSynthesis
+      console.log('Using browser speechSynthesis (fallback)');
       window.speechSynthesis.cancel();
       
       const startAudio = () => {
@@ -227,9 +393,45 @@ export const AwarenessVideos = () => {
           }
           
           const scene = selectedVideo.scenes[currentSceneIndex];
-          const textToSpeak = scene.text || `Scene ${currentSceneIndex + 1}`;
+          let textToSpeak = scene.text || `Scene ${currentSceneIndex + 1}`;
           
-          console.log(`Scene ${currentSceneIndex + 1} text:`, textToSpeak.substring(0, 50) + '...');
+          console.log(`Scene ${currentSceneIndex + 1} original text:`, textToSpeak.substring(0, 50) + '...');
+          
+          // If using fallback English voice for non-English content
+          const isUsingFallbackVoice = matchingVoice?.lang.startsWith('en') && 
+            !['english', 'en'].includes(selectedVideo.language.toLowerCase());
+          
+          if (isUsingFallbackVoice) {
+            console.log('Native voice not available, checking for romanized version...');
+            
+            // If we have romanized script from AI, use it
+            if (selectedVideo.romanizedScript) {
+              // Get corresponding sentence from romanized script
+              const romanizedSentences = selectedVideo.romanizedScript.split(/[.!?]+/).filter(s => s.trim().length > 0);
+              textToSpeak = romanizedSentences[currentSceneIndex] || textToSpeak;
+              console.log('Using AI-generated romanized text:', textToSpeak.substring(0, 50) + '...');
+            } else {
+              // Fallback: use explanation on first scene only
+              if (currentSceneIndex === 0) {
+                textToSpeak = `This video content is in ${selectedVideo.language}. Your device doesn't have ${selectedVideo.language} voice installed. Please read the full script displayed below the video, or install ${selectedVideo.language} voices from your system settings for audio narration.`;
+                console.log('Using fallback explanation');
+              } else {
+                textToSpeak = ''; // Skip remaining scenes
+              }
+            }
+          }
+          
+          // Skip if text is empty
+          if (!textToSpeak.trim()) {
+            console.log(`Skipping audio for scene ${currentSceneIndex + 1}`);
+            currentSceneIndex++;
+            if (currentSceneIndex < selectedVideo.scenes.length) {
+              setTimeout(playSceneAudio, 100);
+            }
+            return;
+          }
+          
+          console.log(`Scene ${currentSceneIndex + 1} text to speak:`, textToSpeak.substring(0, 50) + '...');
           
           const utterance = new SpeechSynthesisUtterance(textToSpeak);
           utterance.rate = 0.85;
@@ -315,7 +517,7 @@ export const AwarenessVideos = () => {
       }
     }, 100);
     
-    // Auto-advance scenes (8 seconds each)
+    // Auto-advance scenes (10 seconds each)
     let sceneIndex = 0;
     intervalRef.current = setInterval(() => {
       sceneIndex++;
@@ -324,7 +526,52 @@ export const AwarenessVideos = () => {
       } else {
         setCurrentScene(sceneIndex);
       }
-    }, 8000);
+    }, 10000);
+  };
+
+  // Romanize text for languages without available voices
+  const romanizeText = (text: string, language: string): string => {
+    const lang = language.toLowerCase();
+    
+    // For now, return original text
+    // In production, this would use a romanization API or library
+    // For Indian languages, we'll ask AI to generate romanized version
+    
+    // Simple fallback: if text has non-Latin characters, return a placeholder
+    const hasNonLatin = /[^\x00-\x7F]+/.test(text);
+    
+    if (hasNonLatin) {
+      // User-friendly message in English
+      if (lang.includes('hindi')) {
+        return `This content is about carbon emissions and sustainability. The original script was generated in Hindi, but your device doesn't have Hindi voice support. Please install Hindi voices from Windows Settings, or the full content is displayed below the video.`;
+      } else if (lang.includes('marathi') || lang.includes('odia') || lang.includes('tamil') || lang.includes('telugu') || lang.includes('bengali')) {
+        return `This content is about carbon emissions and sustainability. The original script was generated in ${language}, but your device doesn't have ${language} voice support. Please install ${language} voices from your system settings, or read the full content displayed below the video.`;
+      } else {
+        return `This educational content about carbon emissions was generated in ${language}. Your device doesn't have ${language} voice support. Please read the full script displayed below the video.`;
+      }
+    }
+    
+    return text;
+  };
+
+  // Seek to specific time in video
+  const seekVideo = (percentage: number) => {
+    if (!selectedVideo || !selectedVideo.scenes || selectedVideo.scenes.length === 0) return;
+    
+    // Calculate which scene to jump to
+    const targetScene = Math.floor((percentage / 100) * selectedVideo.scenes.length);
+    const clampedScene = Math.max(0, Math.min(targetScene, selectedVideo.scenes.length - 1));
+    
+    setCurrentScene(clampedScene);
+    setProgress(percentage);
+    
+    console.log(`Seeking to ${percentage.toFixed(1)}%, scene ${clampedScene + 1}`);
+    
+    // If playing, restart audio from current scene
+    if (isPlaying) {
+      stopVideo();
+      setTimeout(() => playVideo(), 100);
+    }
   };
 
   const stopVideo = () => {
@@ -346,7 +593,15 @@ export const AwarenessVideos = () => {
       keepAliveRef.current = null;
     }
     
-    // Stop audio
+    // Stop audio - ElevenLabs, ResponsiveVoice and browser TTS
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
+    if (typeof (window as any).responsiveVoice !== 'undefined') {
+      (window as any).responsiveVoice.cancel();
+    }
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
@@ -613,8 +868,8 @@ export const AwarenessVideos = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => {
-                setSelectedVideo(null);
                 stopVideo();
+                setSelectedVideo(null);
               }}
               className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
             >
@@ -644,10 +899,14 @@ export const AwarenessVideos = () => {
                       </div>
                     </div>
                     <button
-                      onClick={() => setSelectedVideo(null)}
-                      className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors flex-shrink-0"
+                      onClick={() => {
+                        stopVideo();
+                        setSelectedVideo(null);
+                      }}
+                      className="w-10 h-10 bg-white/20 hover:bg-red-500/80 rounded-full flex items-center justify-center transition-all flex-shrink-0 hover:scale-110"
+                      title="Close (Esc)"
                     >
-                      <span className="text-2xl">×</span>
+                      <span className="text-2xl font-bold">×</span>
                     </button>
                   </div>
                 </div>
@@ -817,9 +1076,17 @@ export const AwarenessVideos = () => {
 
                         {/* Bottom Control Bar */}
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-4 pb-6">
-                          {/* Progress Bar */}
+                          {/* Progress Bar - Clickable for seeking */}
                           <div className="mb-4">
-                            <div className="relative h-1 bg-white/20 rounded-full overflow-hidden cursor-pointer hover:h-1.5 transition-all group">
+                            <div 
+                              className="relative h-1 bg-white/20 rounded-full overflow-visible cursor-pointer hover:h-1.5 transition-all group"
+                              onClick={(e) => {
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                const clickX = e.clientX - rect.left;
+                                const percentage = (clickX / rect.width) * 100;
+                                seekVideo(Math.max(0, Math.min(100, percentage)));
+                              }}
+                            >
                               <motion.div 
                                 className="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 rounded-full"
                                 style={{ width: `${progress}%` }}
@@ -827,8 +1094,8 @@ export const AwarenessVideos = () => {
                               />
                               {/* Progress thumb */}
                               <motion.div
-                                className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                                style={{ left: `${progress}%`, marginLeft: '-6px' }}
+                                className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity border-2 border-purple-500"
+                                style={{ left: `${progress}%`, marginLeft: '-8px' }}
                               />
                             </div>
                           </div>
@@ -894,6 +1161,14 @@ export const AwarenessVideos = () => {
                                   {selectedVideo.language}
                                 </span>
                               </div>
+                              
+                              {/* Quality Badge */}
+                              <div className="bg-blue-500/20 backdrop-blur-md px-3 py-1.5 rounded-lg border border-blue-500/30">
+                                <span className="text-blue-300 text-xs font-medium flex items-center gap-1">
+                                  <Sparkles className="w-3 h-3" />
+                                  AI HD
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -934,33 +1209,47 @@ export const AwarenessVideos = () => {
                     </div>
                   </div>
 
-                  {/* Production Note */}
+                  {/* Voice Support Info */}
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-4">
                     <div className="flex items-start gap-3">
                       <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" />
                       <div className="text-sm text-gray-700">
-                        <strong>Browser Voice Support:</strong> Your browser's text-to-speech may have limited voice options. 
-                        For best results with Hindi, Marathi, or other Indian languages:
-                        <ul className="list-disc ml-5 mt-2 space-y-1">
-                          <li>Use Google Chrome (has Hindi voices on Windows 10/11)</li>
-                          <li>Enable additional voices in Windows Settings → Time & Language → Speech</li>
-                          <li>On Android/iOS, system voices are typically better for regional languages</li>
-                        </ul>
-                        <p className="mt-2 text-xs text-gray-600">
-                          Check browser console for available voices. The AI script is generated in {selectedVideo.language}, 
-                          but pronunciation depends on your system's installed voice packages.
-                        </p>
+                        <strong>Audio Narration:</strong> 
+                        {selectedVideo.romanizedScript ? (
+                          <p className="mt-1">
+                            ✅ This video includes romanized pronunciation! Since {selectedVideo.language} voices may not be available on all devices, 
+                            we've generated a romanized version that English voices can pronounce. The native {selectedVideo.language} script is displayed in the video.
+                          </p>
+                        ) : (
+                          <>
+                            <p className="mt-1">
+                              The audio works best when you have {selectedVideo.language} voices installed on your device.
+                            </p>
+                            <ul className="list-disc ml-5 mt-2 space-y-1 text-xs">
+                              <li>Windows: Settings → Time & Language → Speech → Add voices</li>
+                              <li>Android/iOS: System voices usually support regional languages</li>
+                              <li>Chrome has better voice support than other browsers</li>
+                            </ul>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4">
                     <div className="flex items-start gap-3">
-                      <Sparkles className="w-5 h-5 text-amber-600 flex-shrink-0 mt-1" />
+                      <Sparkles className="w-5 h-5 text-purple-600 flex-shrink-0 mt-1" />
                       <div className="text-sm text-gray-700">
-                        <strong>AI Generated Content:</strong> This video uses Groq AI (FREE) to generate educational content in <strong>{selectedVideo.language}</strong> 
-                        and browser text-to-speech for narration. The script is generated in your requested language, but voice quality 
-                        depends on your device's available speech synthesis voices.
+                        <strong>🎙️ Premium AI Audio by ElevenLabs:</strong> This video uses:
+                        <ul className="list-disc ml-5 mt-2 space-y-1">
+                          <li><strong>Groq AI (FREE)</strong> - Generates educational content in <strong>{selectedVideo.language}</strong></li>
+                          <li><strong>ElevenLabs (Premium)</strong> - Natural, human-like text-to-speech with Eleven Multilingual v2 model</li>
+                          <li>Perfect pronunciation in Hindi, Marathi, Tamil, Telugu, Bengali, and 25+ languages</li>
+                          <li>Realistic voice quality that sounds like a real person speaking</li>
+                        </ul>
+                        <p className="mt-2 text-xs text-purple-700 font-semibold">
+                          🌟 Professional-grade audio narration with authentic pronunciation!
+                        </p>
                       </div>
                     </div>
                   </div>

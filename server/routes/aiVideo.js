@@ -53,17 +53,59 @@ router.post('/generate', async (req, res) => {
     if (GROQ_API_KEY && GROQ_API_KEY !== '') {
       try {
         console.log('Generating script with Groq AI...');
-        const scriptPrompt = `Create an engaging educational script about "${topic}" (${topicDescription}) in ${language} language.
+        // Check if language needs romanization for TTS
+        const needsRomanization = ['hindi', 'marathi', 'odia', 'tamil', 'telugu', 'bengali', 'gujarati', 'kannada', 'malayalam', 'punjabi', 'urdu', 'arabic', 'chinese', 'japanese', 'korean', 'thai'].some(lang => 
+          language.toLowerCase().includes(lang)
+        );
+
+        const scriptPrompt = needsRomanization 
+          ? `Create an engaging educational script about "${topic}" (${topicDescription}) in ${language} language.
 
 The script should:
-- Be 2-3 minutes long when spoken
-- Explain carbon emissions and sustainability concepts clearly
-- Include practical examples and actionable tips
-- Use simple, conversational language
+- Be 4-5 minutes long when spoken (approximately 600-750 words)
+- Explain carbon emissions and sustainability concepts clearly with detailed examples
+- Include practical examples, statistics, and actionable tips
+- Cover multiple aspects: causes, effects, solutions, and individual actions
+- Use simple, conversational language that engages the audience
+
+IMPORTANT: Provide TWO versions:
+1. Native script in ${language} (in native writing system)
+2. Romanized version (using English/Latin alphabet for pronunciation)
+
+Format:
+NATIVE:
+[script in native script]
+
+ROMANIZED:
+[script in Latin/English letters for pronunciation]
+
+Example for Hindi:
+NATIVE: नमस्ते, आज हम बात करेंगे
+ROMANIZED: Namaste, aaj hum baat karenge`
+          : `Create an engaging educational script about "${topic}" (${topicDescription}) in ${language} language.
+
+The script should:
+- Be 4-5 minutes long when spoken (approximately 600-750 words)
+- Explain carbon emissions and sustainability concepts clearly with detailed examples
+- Include practical examples, statistics, and actionable tips
+- Cover multiple aspects: causes, effects, solutions, and individual actions
+- Use simple, conversational language that engages the audience
 
 Provide ONLY the script content, no additional commentary.`;
 
-        script = await queryGroq(scriptPrompt, 'You are an expert environmental educator.');
+        const fullScript = await queryGroq(scriptPrompt, 'You are an expert environmental educator.');
+        
+        // Parse native and romanized versions if applicable
+        if (needsRomanization && fullScript.includes('ROMANIZED:')) {
+          const parts = fullScript.split('ROMANIZED:');
+          script = parts[0].replace('NATIVE:', '').trim();
+          const romanized = parts[1].trim();
+          
+          // Store romanized version in response (we'll use it for TTS fallback)
+          res.locals.romanizedScript = romanized;
+        } else {
+          script = fullScript;
+        }
 
         // Generate takeaways
         console.log('Generating takeaways...');
@@ -104,6 +146,7 @@ Provide ONLY the script content, no additional commentary.`;
       success: true,
       video: {
         script: script,
+        romanizedScript: res.locals.romanizedScript || null,
         language: language,
         topic: topic,
         takeaways: takeaways,
@@ -260,16 +303,23 @@ function generateVideoScenes(topic, script, language) {
     }
   }
   
-  return sentences.slice(0, 8).map((sentence, index) => ({
-    id: index + 1,
-    text: sentence.trim(),
-    icon: icons[index % icons.length],
-    image: images[index % images.length],
-    duration: 6, // seconds per scene
-    animation: index % 3 === 0 ? 'fadeIn' : (index % 3 === 1 ? 'slideUp' : 'zoomIn'),
-    background: `gradient-${(index % 5) + 1}`,
-    overlay: index % 2 === 0 ? 'particles' : 'waves'
-  }));
+  return sentences.slice(0, 12).map((sentence, index) => {
+    let animation;
+    if (index % 3 === 0) animation = 'fadeIn';
+    else if (index % 3 === 1) animation = 'slideUp';
+    else animation = 'zoomIn';
+    
+    return {
+      id: index + 1,
+      text: sentence.trim(),
+      icon: icons[index % icons.length],
+      image: images[index % images.length],
+      duration: 10, // seconds per scene for better viewing
+      animation: animation,
+      background: `gradient-${(index % 5) + 1}`,
+      overlay: index % 2 === 0 ? 'particles' : 'waves'
+    };
+  });
 }
 
 // Health check

@@ -159,3 +159,19 @@ export const aiVideoAPI = {
     return handleResponse(response);
   }
 };
+
+export const elevenLabsAPI = {
+  generateAudio: async (text: string, language: string) => {
+    const response = await fetch(`${API_BASE_URL}/elevenlabs/generate-audio`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ text, language })
+    });
+    return handleResponse(response);
+  },
+  
+  checkHealth: async () => {
+    const response = await fetch(`${API_BASE_URL}/elevenlabs/health`);
+    return handleResponse(response);
+  }
+};
