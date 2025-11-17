@@ -7,6 +7,8 @@ import {
   LayoutDashboard,
   Leaf,
   Video,
+  Bot,
+  Navigation,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -14,6 +16,7 @@ const navItems = [
   { id: "overview", icon: LayoutDashboard, label: "Overview" },
   { id: "ai", icon: Lightbulb, label: "AI Tips" },
   { id: "calculator", icon: Calculator, label: "Calculator" },
+  { id: "route-optimizer", icon: Navigation, label: "Route Optimizer" },
   { id: "awareness", icon: Video, label: "Awareness Videos" },
   { id: "badges", icon: Award, label: "Badges" },
   { id: "profile", icon: Send, label: "Profile" },
