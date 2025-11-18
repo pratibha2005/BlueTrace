@@ -48,8 +48,10 @@ export const Overview = () => {
   const [badges, setBadges] = useState<Badge[]>([]);
   const [history, setHistory] = useState<Emission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeChartTab, setActiveChartTab] = useState<'emissions' | 'trends' | 'goals'>('emissions');
 
-  useEffect(() => {
+  const fetchData = () => {
+    setLoading(true);
     Promise.all([
       calculatorAPI.getStats(),
       suggestionsAPI.getSuggestions(),
@@ -64,6 +66,22 @@ export const Overview = () => {
       })
       .catch(err => console.error('Failed to fetch dashboard data:', err))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchData();
+
+    // Listen for calculation events to refresh data
+    const handleCalculation = () => {
+      console.log('New calculation detected, refreshing data...');
+      fetchData();
+    };
+
+    globalThis.addEventListener('calculationComplete', handleCalculation);
+    
+    return () => {
+      globalThis.removeEventListener('calculationComplete', handleCalculation);
+    };
   }, []);
 
   if (loading) {
@@ -91,20 +109,174 @@ export const Overview = () => {
     : [];
 
   return (
-    <div className="min-h-screen bg-transparent p-8">
+    <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-[1400px] mx-auto">
-        {/* Welcome Header */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="mb-8"
-        >
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-gray-900 via-teal-800 to-emerald-700 bg-clip-text text-transparent mb-3">
-            Welcome back! 👋
-          </h1>
-          <p className="text-gray-600 text-lg">Here's your carbon footprint overview</p>
-        </motion.div>
+        {/* Top Section - Performance + Activity Chart */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Performance Card - Dark */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-gradient-to-br from-emerald-900 via-teal-900 to-green-900 rounded-3xl p-6 shadow-2xl"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-white font-bold text-lg">Carbon Stats</h3>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div>
+                <div className="text-white text-3xl font-bold mb-1">{stats?.totalEmissions || 0}</div>
+                <div className="text-white/60 text-sm">Total CO₂</div>
+              </div>
+              <div>
+                <div className="text-white text-3xl font-bold mb-1">{stats?.avgEmissions || 0}</div>
+                <div className="text-white/60 text-sm">Average</div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                  <TrendingDown className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-white text-sm font-medium">Monthly emissions</div>
+                  <div className="text-white/50 text-xs">{stats?.monthlyEmissions || 0} kg CO₂</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-teal-400" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-white text-sm font-medium">Total calculations</div>
+                  <div className="text-white/50 text-xs">{stats?.totalCalculations || 0} trips</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 opacity-50">
+                <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                  <Target className="w-5 h-5 text-green-400" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-white text-sm font-medium">Target goal</div>
+                  <div className="text-white/50 text-xs">In progress</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Activity Chart - Light Blue */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="lg:col-span-2 bg-gradient-to-br from-emerald-200 via-teal-200 to-green-300 rounded-3xl p-6 shadow-xl relative overflow-hidden"
+          >
+            <div className="flex items-center gap-6 mb-4">
+              <button 
+                onClick={() => setActiveChartTab('emissions')}
+                className={`text-lg font-bold pb-2 transition-all ${
+                  activeChartTab === 'emissions' 
+                    ? 'text-slate-900 border-b-4 border-slate-900' 
+                    : 'text-slate-600 hover:text-slate-800'
+                }`}
+              >
+                Emissions
+              </button>
+              <button 
+                onClick={() => setActiveChartTab('trends')}
+                className={`text-lg font-medium pb-2 transition-all ${
+                  activeChartTab === 'trends' 
+                    ? 'text-slate-900 border-b-4 border-slate-900' 
+                    : 'text-slate-600 hover:text-slate-800'
+                }`}
+              >
+                Trends
+              </button>
+              <button 
+                onClick={() => setActiveChartTab('goals')}
+                className={`text-lg font-medium pb-2 transition-all ${
+                  activeChartTab === 'goals' 
+                    ? 'text-slate-900 border-b-4 border-slate-900' 
+                    : 'text-slate-600 hover:text-slate-800'
+                }`}
+              >
+                Goals
+              </button>
+              <div className="ml-auto">
+                <button className="px-4 py-2 bg-slate-900 text-white text-sm rounded-xl font-medium">
+                  Week
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-white rounded-2xl px-4 py-3 shadow-lg flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                  <Leaf className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-slate-900 font-bold text-lg">{stats?.totalEmissions || 0}</div>
+                  <div className="text-slate-500 text-xs">Total CO₂</div>
+                </div>
+              </div>
+              <div className="text-slate-600 text-sm">
+                Your data updates<br />every <span className="font-bold">3 hours</span>
+              </div>
+            </div>
+
+            <div className="h-44">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="colorEmissions" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="rgba(255,255,255,0.8)" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="rgba(255,255,255,0.1)" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="0" stroke="rgba(255,255,255,0.3)" />
+                  <XAxis 
+                    dataKey="name" 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }}
+                  />
+                  <YAxis hide />
+                  <Area 
+                    type="monotone" 
+                    dataKey="emissions" 
+                    stroke="white"
+                    strokeWidth={3}
+                    fillOpacity={1} 
+                    fill="url(#colorEmissions)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Your Stats Section */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-slate-900">Your emissions breakdown</h2>
+            <div className="flex gap-2">
+              <button className="w-10 h-10 rounded-xl bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors">
+                <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button className="w-10 h-10 rounded-xl bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors">
+                <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* Top Stats - Hero Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -157,6 +329,79 @@ export const Overview = () => {
               <span>+8 this week</span>
             </div>
           </motion.div>
+        </div>
+
+        {/* Large Gradient Cards - Vehicle Breakdown */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {vehicleData.slice(0, 3).map((item, index) => {
+            const IconComponent = VEHICLE_CONFIG[item.vehicle.toLowerCase() as keyof typeof VEHICLE_CONFIG]?.icon || Car;
+            const percentage = ((item.emissions / Number.parseFloat(stats?.totalEmissions || '1')) * 100).toFixed(0);
+            const gradients = [
+              'from-emerald-400 via-teal-400 to-green-500',
+              'from-teal-400 via-cyan-400 to-blue-400',
+              'from-green-400 via-emerald-400 to-teal-500'
+            ];
+            
+            return (
+              <motion.div
+                key={item.vehicle}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
+                className={`bg-gradient-to-br ${gradients[index]} rounded-3xl p-6 shadow-xl relative overflow-hidden group cursor-pointer hover:shadow-2xl transition-shadow`}
+              >
+                <div className="relative z-10">
+                  <h3 className="text-slate-900 font-bold text-xl mb-1 capitalize">{item.vehicle}</h3>
+                  <p className="text-slate-700 text-sm mb-8">Transportation mode</p>
+
+                  {/* Progress Circle */}
+                  <div className="mb-8">
+                    <div className="relative w-24 h-24">
+                      <svg className="w-24 h-24 transform -rotate-90">
+                        <circle
+                          cx="48"
+                          cy="48"
+                          r="40"
+                          stroke="rgba(255,255,255,0.3)"
+                          strokeWidth="8"
+                          fill="none"
+                        />
+                        <circle
+                          cx="48"
+                          cy="48"
+                          r="40"
+                          stroke="white"
+                          strokeWidth="8"
+                          fill="none"
+                          strokeDasharray={`${2 * Math.PI * 40}`}
+                          strokeDashoffset={`${2 * Math.PI * 40 * (1 - Number(percentage) / 100)}`}
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-slate-900 font-bold text-lg">{percentage}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Icon Overlay */}
+                <div className="absolute bottom-0 right-0 w-32 h-32 opacity-30 group-hover:opacity-50 transition-opacity">
+                  <IconComponent className="w-full h-full text-white" />
+                </div>
+
+                {/* Bottom Stats */}
+                <div className="relative z-10 flex items-center justify-between">
+                  <div className="flex items-center gap-4 text-slate-900 text-sm font-medium">
+                    <span>{item.emissions.toFixed(1)} kg CO₂</span>
+                  </div>
+                  <button className="w-10 h-10 rounded-xl bg-white/80 flex items-center justify-center hover:bg-white transition-colors">
+                    <ArrowUpRight className="w-5 h-5 text-slate-900" />
+                  </button>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Secondary Stats */}
