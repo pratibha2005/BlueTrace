@@ -144,3 +144,112 @@ export const awarenessAPI = {
     return handleResponse(response);
   }
 };
+
+export const aiVideoAPI = {
+  generateVideo: async (data: {
+    topic: string;
+    topicDescription: string;
+    language: string;
+  }) => {
+    const response = await fetch(`${API_BASE_URL}/ai-video/generate`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    return handleResponse(response);
+  }
+};
+
+export const elevenLabsAPI = {
+  generateAudio: async (text: string, language: string) => {
+    const response = await fetch(`${API_BASE_URL}/elevenlabs/generate-audio`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ text, language })
+    });
+    return handleResponse(response);
+  },
+  
+  checkHealth: async () => {
+    const response = await fetch(`${API_BASE_URL}/elevenlabs/health`);
+    return handleResponse(response);
+  }
+};
+
+export const ecobotAPI = {
+  chat: async (message: string, language = 'English', conversationHistory: any[] = []) => {
+    const response = await fetch(`${API_BASE_URL}/ecobot/chat`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ message, language, conversationHistory })
+    });
+    return handleResponse(response);
+  },
+
+  getDailyTip: async (language = 'English') => {
+    const response = await fetch(`${API_BASE_URL}/ecobot/daily-tip?language=${language}`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  },
+
+  getSuggestions: async (language = 'English') => {
+    const response = await fetch(`${API_BASE_URL}/ecobot/suggestions?language=${language}`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  },
+
+  getNotification: async () => {
+    const response = await fetch(`${API_BASE_URL}/ecobot/notification`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  },
+
+  explain: async (topic: string, language = 'English') => {
+    const response = await fetch(`${API_BASE_URL}/ecobot/explain`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ topic, language })
+    });
+    return handleResponse(response);
+  }
+};
+
+export const routeOptimizerAPI = {
+  optimize: async (data: {
+    origin: string;
+    destination: string;
+    vehicleType: string;
+    fuelType: string;
+    routes?: any[];
+  }) => {
+    const response = await fetch(`${API_BASE_URL}/route-optimizer/optimize`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    return handleResponse(response);
+  },
+
+  saveScore: async (data: {
+    routeChoice: string;
+    emissionsSaved: number;
+    date: Date;
+  }) => {
+    const response = await fetch(`${API_BASE_URL}/route-optimizer/save-score`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    return handleResponse(response);
+  },
+
+  getStats: async () => {
+    const response = await fetch(`${API_BASE_URL}/route-optimizer/stats`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  }
+};

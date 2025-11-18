@@ -77,6 +77,9 @@ export const Calculator = () => {
         }));
       } catch {}
 
+      // Dispatch event to refresh dashboard data
+      globalThis.dispatchEvent(new CustomEvent('calculationComplete'));
+
     } catch (err: any) {
       console.error('Calculation error:', err);
       setError(err.message || 'Failed to calculate emissions');
