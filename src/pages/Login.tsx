@@ -139,7 +139,7 @@ export const Login = () => {
                     </Link>
                 </p>
             </div>
-
+{/* Working of the a ndaioo */}
             {/* RIGHT SIDE: The Design/Branding Panel with Animation */}
             <div className="hidden md:flex flex-col items-center justify-center bg-teal-600/20 p-12 relative overflow-hidden">
                 {/* Visual Title */}
