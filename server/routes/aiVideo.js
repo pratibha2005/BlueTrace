@@ -88,13 +88,13 @@ router.post('/generate', async (req, res) => {
     let takeaways = [];
     let videoPrompt = '';
 
-    // Try Google Gemini first, then fallback to Groq
-    const useGemini = GEMINI_API_KEY && GEMINI_API_KEY !== '';
+    // Try Groq first (better quota), then fallback to Gemini
     const useGroq = GROQ_API_KEY && GROQ_API_KEY !== '';
+    const useGemini = GEMINI_API_KEY && GEMINI_API_KEY !== '';
 
-    if (useGemini || useGroq) {
+    if (useGroq || useGemini) {
       try {
-        const aiEngine = useGemini ? 'Google Gemini' : 'Groq AI';
+        const aiEngine = useGroq ? 'Groq AI' : 'Google Gemini';
         console.log(`Generating script with ${aiEngine}...`);
         // Check if language needs romanization for TTS
         // All Indian languages + major world languages that use non-Latin scripts
@@ -143,8 +143,8 @@ The script should:
 
 Provide ONLY the script content, no additional commentary.`;
 
-        // Use Gemini if available, otherwise fallback to Groq
-        const queryAI = useGemini ? queryGemini : queryGroq;
+        // Use Groq if available (better quota), otherwise fallback to Gemini
+        const queryAI = useGroq ? queryGroq : queryGemini;
         const fullScript = await queryAI(scriptPrompt, 'You are an expert environmental educator.');
         
         // Parse native and romanized versions if applicable
@@ -171,12 +171,12 @@ Provide ONLY the script content, no additional commentary.`;
           .filter(line => line.length > 10)
           .slice(0, 4);
 
-      } catch (groqError) {
-        console.log('Groq API failed, using fallback:', groqError.message);
+      } catch (aiError) {
+        console.log(`${aiEngine} API failed, using fallback:`, aiError.message);
         script = generateFallbackScript(topic, topicDescription, language);
       }
     } else {
-      console.log('No Groq API key, using fallback content');
+      console.log('No AI API keys available, using fallback content');
       script = generateFallbackScript(topic, topicDescription, language);
     }
 
@@ -306,8 +306,11 @@ async function generateVideoScenes(topic, script, language) {
     searchQuery = 'people community environment nature';
   }
   
-  // Fetch video clips from Pexels
-  const videos = await fetchPexelsVideos(searchQuery, 8);
+  // Fetch video clips from Pexels (with fallback to images)
+  let videos = await fetchPexelsVideos(searchQuery, 8);
+  if (!videos || videos.length === 0) {
+    console.log('Pexels videos not available, will use fallback images');
+  }
   
   // Fallback images if Pexels fails
   const topicImages = {
