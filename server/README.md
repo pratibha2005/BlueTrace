@@ -11,6 +11,9 @@ npm install
 - MONGODB_URI: Your MongoDB connection string
 - JWT_SECRET: Secret key for JWT tokens
 - PORT: Server port (default: 5000)
+- GEMINI_API_KEY: Google Gemini API key (for AI video generation - primary)
+- GROQ_API_KEY: Groq API key (fallback for AI video generation)
+- ELEVENLABS_API_KEY: ElevenLabs API key (for text-to-speech audio)
 
 3. Start the server:
 ```bash

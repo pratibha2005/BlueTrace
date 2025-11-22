@@ -21,6 +21,8 @@ interface VideoScene {
   text: string;
   icon: string;
   image: string;
+  media?: string;
+  mediaType?: 'image' | 'video';
   duration: number;
   animation: string;
   background: string;
@@ -675,25 +677,30 @@ export const AwarenessVideos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* Header with floating gradient animation */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="mb-8"
+          transition={{ duration: 0.5 }}
+          className="mb-10 relative"
         >
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 rounded-2xl flex items-center justify-center shadow-xl">
-              <Wand2 className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-purple-800 to-pink-700 bg-clip-text text-transparent">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 via-pink-400/20 to-rose-400/20 blur-3xl -z-10" />
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <motion.div 
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="w-20 h-20 bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 rounded-3xl flex items-center justify-center shadow-2xl"
+            >
+              <Wand2 className="w-10 h-10 text-white" />
+            </motion.div>
+            <div className="text-center">
+              <h1 className="text-5xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-2">
                 AI Video Generator
               </h1>
-              <p className="text-gray-600 text-lg mt-1">
-                Generate educational videos in any language with AI
+              <p className="text-gray-600 text-xl font-medium">
+                Generate educational videos in any language with AI ✨
               </p>
             </div>
           </div>
@@ -701,23 +708,27 @@ export const AwarenessVideos = () => {
           {/* Video Generator Form */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             {/* Left: Topic Selection */}
-            <div className="lg:col-span-2 bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
-              <div className="flex items-center gap-3 mb-6">
-                <BookOpen className="w-6 h-6 text-purple-600" />
-                <h3 className="text-xl font-bold text-gray-900">Choose a Topic</h3>
+            <div className="lg:col-span-2 bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-purple-100">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900">Choose a Topic</h3>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {VIDEO_TOPICS.map((topic) => {
                   const Icon = topic.icon;
                   return (
-                    <button
+                    <motion.button
                       key={topic.id}
                       onClick={() => setSelectedTopic(topic.id)}
-                      className={`p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`p-5 rounded-2xl border-2 transition-all duration-300 text-left relative overflow-hidden group ${
                         selectedTopic === topic.id
-                          ? 'border-purple-500 bg-purple-50 shadow-lg scale-105'
-                          : 'border-gray-200 bg-white hover:border-purple-200 hover:shadow-md'
+                          ? 'border-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 shadow-xl'
+                          : 'border-gray-200 bg-white hover:border-purple-300 hover:shadow-lg'
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -732,7 +743,7 @@ export const AwarenessVideos = () => {
                           <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0" />
                         )}
                       </div>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>
@@ -773,23 +784,26 @@ export const AwarenessVideos = () => {
                 </div>
               </div>
 
-              <button
+              <motion.button
                 onClick={generateVideo}
                 disabled={!selectedTopic || !userLanguage.trim() || isGenerating}
-                className="w-full py-4 bg-white text-purple-600 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full py-5 bg-white text-purple-600 rounded-2xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group"
               >
                 {isGenerating ? (
                   <>
-                    <Loader className="w-5 h-5 animate-spin" />
-                    Generating Video...
+                    <Loader className="w-6 h-6 animate-spin" />
+                    <span className="text-lg">Generating Video...</span>
                   </>
                 ) : (
                   <>
-                    <Wand2 className="w-5 h-5" />
-                    Generate AI Video
+                    <Wand2 className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+                    <span className="text-lg">Generate AI Video</span>
+                    <Sparkles className="w-5 h-5 text-purple-400" />
                   </>
                 )}
-              </button>
+              </motion.button>
 
               {error && (
                 <div className="mt-4 bg-red-500/20 border border-red-500/50 rounded-lg p-3 flex items-start gap-2">
@@ -1005,22 +1019,37 @@ export const AwarenessVideos = () => {
                               )}
                             </div>
 
-                            {/* Real Image Background */}
+                            {/* Video or Image Background */}
                             <motion.div
                               initial={{ scale: 1.2, opacity: 0 }}
                               animate={{ scale: 1, opacity: 1 }}
                               transition={{ duration: 0.8 }}
                               className="absolute inset-0"
                             >
-                              <img
-                                src={selectedVideo.scenes[currentScene].image}
-                                alt={selectedVideo.scenes[currentScene].text}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  // Fallback to gradient if image fails to load
-                                  e.currentTarget.style.display = 'none';
-                                }}
-                              />
+                              {(selectedVideo.scenes[currentScene] as any).mediaType === 'video' ? (
+                                <video
+                                  src={(selectedVideo.scenes[currentScene] as any).media}
+                                  autoPlay
+                                  loop
+                                  muted
+                                  playsInline
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    // Fallback to gradient if video fails to load
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              ) : (
+                                <img
+                                  src={selectedVideo.scenes[currentScene].image}
+                                  alt={selectedVideo.scenes[currentScene].text}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    // Fallback to gradient if image fails to load
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              )}
                               {/* Dark overlay for better text visibility */}
                               <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70"></div>
                             </motion.div>

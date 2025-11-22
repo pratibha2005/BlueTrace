@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Navigation, MapPin, Fuel, Leaf, Clock, TrendingDown, Award, Zap, DollarSign } from 'lucide-react';
+import { Navigation, MapPin, Fuel, Leaf, Clock, TrendingDown, Award, Zap, DollarSign, Sparkles, CheckCircle } from 'lucide-react';
 import { routeOptimizerAPI } from '../services/api';
 
 interface Route {
@@ -121,88 +121,115 @@ export default function RouteOptimizer() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 p-6 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-green-400/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      </div>
+      
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Enhanced Header */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="text-center mb-10"
         >
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <div className="w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center">
-              <Navigation className="text-white" size={28} />
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <motion.div 
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="w-20 h-20 bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-3xl flex items-center justify-center shadow-2xl"
+            >
+              <Navigation className="text-white" size={36} />
+            </motion.div>
+            <div>
+              <h1 className="text-5xl font-black bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                AI Route Optimizer
+              </h1>
+              <div className="flex items-center justify-center gap-2 mt-2">
+                <Leaf className="w-5 h-5 text-green-600" />
+                <p className="text-gray-700 text-lg font-semibold">Find the greenest route and save CO₂ with every journey</p>
+                <Leaf className="w-5 h-5 text-green-600" />
+              </div>
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-              AI Route Optimizer
-            </h1>
           </div>
-          <p className="text-gray-600 text-lg">Find the greenest route and save CO₂ with every journey 🌍</p>
         </motion.div>
 
-        {/* Stats Cards */}
+        {/* Enhanced Stats Cards */}
         {stats && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8"
+            transition={{ duration: 0.5 }}
+            className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10"
           >
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Navigation className="text-blue-600" size={20} />
+            <motion.div 
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 shadow-2xl group cursor-pointer"
+            >
+              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4">
+                  <Navigation className="text-white" size={24} />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600">Total Trips</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalTrips}</p>
-                </div>
+                <p className="text-sm text-blue-100 font-medium mb-1">Total Trips</p>
+                <p className="text-4xl font-black text-white">{stats.totalTrips}</p>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Leaf className="text-green-600" size={20} />
+            <motion.div 
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="relative overflow-hidden bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 shadow-2xl group cursor-pointer"
+            >
+              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4">
+                  <Leaf className="text-white" size={24} />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600">Green Routes</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.greenRoutesChosen}</p>
-                </div>
+                <p className="text-sm text-green-100 font-medium mb-1">Green Routes</p>
+                <p className="text-4xl font-black text-white">{stats.greenRoutesChosen}</p>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                  <TrendingDown className="text-emerald-600" size={20} />
+            <motion.div 
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 shadow-2xl group cursor-pointer"
+            >
+              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4">
+                  <TrendingDown className="text-white" size={24} />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600">CO₂ Saved</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalEmissionsSaved} kg</p>
-                </div>
+                <p className="text-sm text-emerald-100 font-medium mb-1">CO₂ Saved</p>
+                <p className="text-4xl font-black text-white">{stats.totalEmissionsSaved}</p>
+                <p className="text-xs text-emerald-100 mt-1">kilograms</p>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Award className="text-purple-600" size={20} />
+            <motion.div 
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="relative overflow-hidden bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-6 shadow-2xl group cursor-pointer"
+            >
+              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4">
+                  <Award className="text-white" size={24} />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600">Eco Score</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.ecoScore}</p>
-                </div>
+                <p className="text-sm text-purple-100 font-medium mb-1">Eco Score</p>
+                <p className="text-4xl font-black text-white">{stats.ecoScore}</p>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
 
-        {/* Input Form */}
+        {/* Enhanced Input Form */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-200"
+          transition={{ delay: 0.2 }}
+          className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-10 border border-green-100"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Origin */}
@@ -273,45 +300,57 @@ export default function RouteOptimizer() {
             </div>
           </div>
 
-          <button
+          <motion.button
             onClick={optimizeRoute}
             disabled={isLoading || !origin || !destination}
-            className="w-full mt-6 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full mt-8 py-5 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white font-bold rounded-2xl hover:from-green-600 hover:via-emerald-600 hover:to-teal-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-2xl hover:shadow-3xl flex items-center justify-center gap-3 group"
           >
             {isLoading ? (
               <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Analyzing Routes...
+                <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-lg">Analyzing Routes...</span>
               </>
             ) : (
               <>
-                <Navigation size={20} />
-                Find Greenest Route
+                <Navigation size={24} className="group-hover:rotate-12 transition-transform" />
+                <span className="text-lg">Find Greenest Route</span>
+                <Leaf size={20} className="text-green-200" />
               </>
             )}
-          </button>
+          </motion.button>
         </motion.div>
 
-        {/* Recommendation Banner */}
+        {/* Enhanced Recommendation Banner */}
         {recommendation && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-6 mb-8 text-white shadow-xl"
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="relative overflow-hidden bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 rounded-3xl p-8 mb-10 text-white shadow-2xl"
           >
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                <Leaf size={32} />
-              </div>
+            <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity duration-300" />
+            <div className="relative z-10 flex items-center gap-6">
+              <motion.div 
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center backdrop-blur-sm shadow-xl"
+              >
+                <Leaf size={40} />
+              </motion.div>
               <div className="flex-1">
-                <h3 className="text-2xl font-bold mb-2">{recommendation.message}</h3>
-                <div className="flex items-center gap-6 text-white/90">
-                  <span className="flex items-center gap-2">
-                    <TrendingDown size={18} />
+                <h3 className="text-3xl font-black mb-3 flex items-center gap-2">
+                  {recommendation.message}
+                  <Sparkles size={24} className="text-yellow-300" />
+                </h3>
+                <div className="flex items-center gap-8 text-lg">
+                  <span className="flex items-center gap-2 font-semibold bg-white/20 px-4 py-2 rounded-xl backdrop-blur-sm">
+                    <TrendingDown size={20} />
                     Save {recommendation.emissionsSaved} kg CO₂
                   </span>
-                  <span className="flex items-center gap-2">
-                    <DollarSign size={18} />
+                  <span className="flex items-center gap-2 font-semibold bg-white/20 px-4 py-2 rounded-xl backdrop-blur-sm">
+                    <DollarSign size={20} />
                     Save ₹{recommendation.costSaved}
                   </span>
                 </div>
@@ -320,35 +359,38 @@ export default function RouteOptimizer() {
           </motion.div>
         )}
 
-        {/* Routes Comparison Table */}
+        {/* Enhanced Routes Comparison Table */}
         {routes.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200"
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-green-100"
           >
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                <thead className="bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border-b-2 border-green-200">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">Route</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-700">Time</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-700">Distance</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-700">Fuel Burn</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-700">CO₂ Emission</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-700">Cost</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-700">Green Score</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-700">Action</th>
+                    <th className="px-6 py-5 text-left text-sm font-black text-gray-800 uppercase tracking-wide">Route</th>
+                    <th className="px-6 py-5 text-center text-sm font-black text-gray-800 uppercase tracking-wide">Time</th>
+                    <th className="px-6 py-5 text-center text-sm font-black text-gray-800 uppercase tracking-wide">Distance</th>
+                    <th className="px-6 py-5 text-center text-sm font-black text-gray-800 uppercase tracking-wide">Fuel Burn</th>
+                    <th className="px-6 py-5 text-center text-sm font-black text-gray-800 uppercase tracking-wide">CO₂ Emission</th>
+                    <th className="px-6 py-5 text-center text-sm font-black text-gray-800 uppercase tracking-wide">Cost</th>
+                    <th className="px-6 py-5 text-center text-sm font-black text-gray-800 uppercase tracking-wide">Green Score</th>
+                    <th className="px-6 py-5 text-center text-sm font-black text-gray-800 uppercase tracking-wide">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-100">
                   {routes.map((route, index) => (
-                    <tr
+                    <motion.tr
                       key={index}
-                      className={`hover:bg-gray-50 transition-colors ${
-                        index === recommendation?.greenestRouteIndex ? 'bg-green-50' : ''
-                      } ${selectedRoute === index ? 'ring-2 ring-green-500' : ''}`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className={`hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 transition-all duration-300 ${
+                        index === recommendation?.greenestRouteIndex ? 'bg-gradient-to-r from-green-50 to-emerald-50' : ''
+                      } ${selectedRoute === index ? 'ring-2 ring-green-500 bg-green-100' : ''}`}
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -399,27 +441,30 @@ export default function RouteOptimizer() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <button
+                        <motion.button
                           onClick={() => selectRoute(index)}
-                          className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 mx-auto ${
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className={`px-5 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 mx-auto shadow-lg hover:shadow-xl ${
                             selectedRoute === index
-                              ? 'bg-green-500 text-white'
-                              : 'bg-blue-500 text-white hover:bg-blue-600'
+                              ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
+                              : 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600'
                           }`}
                         >
                           {selectedRoute === index ? (
                             <>
-                              Selected ✓
+                              <CheckCircle size={18} />
+                              Selected
                             </>
                           ) : (
                             <>
-                              <Navigation size={16} />
+                              <Navigation size={18} />
                               Navigate
                             </>
                           )}
-                        </button>
+                        </motion.button>
                       </td>
-                    </tr>
+                    </motion.tr>
                   ))}
                 </tbody>
               </table>

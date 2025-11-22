@@ -1,11 +1,49 @@
 const express = require('express');
 const router = express.Router();
 
-// Use Groq API - FREE and FAST alternative
+// Google Gemini API for video generation
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
+
+// Fallback to Groq for script generation if Gemini unavailable
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-// Helper function to call Groq API (FREE - 14,400 requests/day)
+// Pexels API for video clips
+const PEXELS_API_KEY = process.env.PEXELS_API_KEY || 'WKuzmVrYQYbC6qFdlS1ycY5tKQWsqCYQkIjF9j3rF3jQPXhQhQhhqWLd';
+
+// Helper function to call Google Gemini API
+async function queryGemini(prompt, systemPrompt = '') {
+  const fullPrompt = systemPrompt ? `${systemPrompt}\n\n${prompt}` : prompt;
+  
+  const response = await fetch(`${GEMINI_API_URL}/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      contents: [{
+        parts: [{
+          text: fullPrompt
+        }]
+      }],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 2048,
+      }
+    })
+  });
+  
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Gemini API error: ${response.statusText} - ${error}`);
+  }
+  
+  const data = await response.json();
+  return data.candidates[0].content.parts[0].text;
+}
+
+// Helper function to call Groq API as fallback
 async function queryGroq(prompt, systemPrompt = '') {
   const messages = systemPrompt 
     ? [
@@ -21,7 +59,7 @@ async function queryGroq(prompt, systemPrompt = '') {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile', // Updated FREE model (Nov 2024)
+      model: 'llama-3.3-70b-versatile',
       messages: messages,
       temperature: 0.7,
       max_tokens: 2000
@@ -48,11 +86,16 @@ router.post('/generate', async (req, res) => {
 
     let script = '';
     let takeaways = [];
+    let videoPrompt = '';
 
-    // Try Groq API if key is available
-    if (GROQ_API_KEY && GROQ_API_KEY !== '') {
+    // Try Google Gemini first, then fallback to Groq
+    const useGemini = GEMINI_API_KEY && GEMINI_API_KEY !== '';
+    const useGroq = GROQ_API_KEY && GROQ_API_KEY !== '';
+
+    if (useGemini || useGroq) {
       try {
-        console.log('Generating script with Groq AI...');
+        const aiEngine = useGemini ? 'Google Gemini' : 'Groq AI';
+        console.log(`Generating script with ${aiEngine}...`);
         // Check if language needs romanization for TTS
         // All Indian languages + major world languages that use non-Latin scripts
         const needsRomanization = [
@@ -100,7 +143,9 @@ The script should:
 
 Provide ONLY the script content, no additional commentary.`;
 
-        const fullScript = await queryGroq(scriptPrompt, 'You are an expert environmental educator.');
+        // Use Gemini if available, otherwise fallback to Groq
+        const queryAI = useGemini ? queryGemini : queryGroq;
+        const fullScript = await queryAI(scriptPrompt, 'You are an expert environmental educator.');
         
         // Parse native and romanized versions if applicable
         if (needsRomanization && fullScript.includes('ROMANIZED:')) {
@@ -117,7 +162,7 @@ Provide ONLY the script content, no additional commentary.`;
         // Generate takeaways
         console.log('Generating takeaways...');
         const takeawaysPrompt = `Based on "${topic}", list exactly 4 key takeaways in ${language}. Format as simple bullet points.`;
-        const takeawaysText = await queryGroq(takeawaysPrompt);
+        const takeawaysText = await queryAI(takeawaysPrompt);
 
         takeaways = takeawaysText
           .split('\n')
@@ -145,8 +190,8 @@ Provide ONLY the script content, no additional commentary.`;
       ];
     }
 
-    // Generate video scenes for animation
-    const videoScenes = generateVideoScenes(topic, script, language);
+    // Generate video scenes with actual video clips
+    const videoScenes = await generateVideoScenes(topic, script, language);
 
     // Return the generated content
     res.json({
@@ -169,7 +214,7 @@ Provide ONLY the script content, no additional commentary.`;
     // Return a fallback response
     const { topic, topicDescription, language } = req.body;
     const fallbackScript = generateFallbackScript(topic, topicDescription, language);
-    const videoScenes = generateVideoScenes(topic, fallbackScript, language);
+    const videoScenes = await generateVideoScenes(topic, fallbackScript, language);
     
     res.json({
       success: true,
@@ -218,12 +263,53 @@ Together, we can build a cleaner, greener future for generations to come.
 [This content is AI-generated in ${language} language]`;
 }
 
-// Generate video scenes for animation with visuals
-function generateVideoScenes(topic, script, language) {
+// Helper function to fetch video clips from Pexels
+async function fetchPexelsVideos(query, count = 6) {
+  try {
+    const response = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=${count}&orientation=landscape`, {
+      headers: {
+        'Authorization': PEXELS_API_KEY
+      }
+    });
+    
+    if (!response.ok) {
+      console.log(`Pexels API failed for query: ${query}`);
+      return null;
+    }
+    
+    const data = await response.json();
+    return data.videos || [];
+  } catch (error) {
+    console.error('Pexels fetch error:', error.message);
+    return null;
+  }
+}
+
+// Generate video scenes with actual video clips
+async function generateVideoScenes(topic, script, language) {
   // Split script into sentences for scene-by-scene display
   const sentences = script.split(/[.!?]+/).filter(s => s.trim().length > 0);
   
-  // Real images for different topics (Unsplash random images)
+  // Determine search query based on topic
+  const topicLower = topic.toLowerCase();
+  let searchQuery = 'nature environment';
+  
+  if (topicLower.includes('carbon') || topicLower.includes('emission')) {
+    searchQuery = 'pollution factory emissions climate';
+  } else if (topicLower.includes('vehicle') || topicLower.includes('car')) {
+    searchQuery = 'electric car traffic transportation';
+  } else if (topicLower.includes('transport')) {
+    searchQuery = 'public transport bus train bicycle';
+  } else if (topicLower.includes('electric')) {
+    searchQuery = 'electric vehicle charging clean energy';
+  } else if (topicLower.includes('community')) {
+    searchQuery = 'people community environment nature';
+  }
+  
+  // Fetch video clips from Pexels
+  const videos = await fetchPexelsVideos(searchQuery, 8);
+  
+  // Fallback images if Pexels fails
   const topicImages = {
     'carbon': [
       'https://images.unsplash.com/photo-1569163139394-de4798aa62b6?w=800',
@@ -297,10 +383,9 @@ function generateVideoScenes(topic, script, language) {
     'community': ['👥', '🤝', '🌍', '💚', '🏘️', '🌳', '✨', '🌟']
   };
 
-  // Determine which image and icon set to use
+  // Determine which image and icon set to use (fallback)
   let images = topicImages['carbon'];
   let icons = topicIcons['carbon'];
-  const topicLower = topic.toLowerCase();
   
   for (const [key, imageSet] of Object.entries(topicImages)) {
     if (topicLower.includes(key)) {
@@ -310,17 +395,32 @@ function generateVideoScenes(topic, script, language) {
     }
   }
   
+  // Create scenes with video clips or fallback images
   return sentences.slice(0, 6).map((sentence, index) => {
     let animation;
     if (index % 3 === 0) animation = 'fadeIn';
     else if (index % 3 === 1) animation = 'slideUp';
     else animation = 'zoomIn';
     
+    // Use video if available, otherwise fallback to image
+    let mediaUrl = images[index % images.length];
+    let mediaType = 'image';
+    
+    if (videos && videos.length > 0) {
+      const video = videos[index % videos.length];
+      // Get medium quality video file (720p)
+      const videoFile = video.video_files.find(f => f.quality === 'hd' || f.quality === 'sd') || video.video_files[0];
+      mediaUrl = videoFile.link;
+      mediaType = 'video';
+    }
+    
     return {
       id: index + 1,
       text: sentence.trim(),
       icon: icons[index % icons.length],
-      image: images[index % images.length],
+      media: mediaUrl,
+      mediaType: mediaType, // 'video' or 'image'
+      image: mediaType === 'image' ? mediaUrl : video.image, // Keep image for backward compatibility
       duration: 8, // seconds per scene
       animation: animation,
       background: `gradient-${(index % 5) + 1}`,
