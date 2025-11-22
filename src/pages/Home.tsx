@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Lottie from "lottie-react";
 import Homesvg from "../assets/animations/Homesvg.json";
+// @ts-ignore - JSX file
 import Squares from '../ReactBits/HomeSquares';
 
 //import icons
@@ -11,14 +12,13 @@ import {
   TrendingDown,
   Award,
   Globe,
-  Sparkles,
   Zap,
   Leaf,
 } from "lucide-react";
 
 // --- Reusable Stat Card ---
 
-const StatCard = ({ number, label }) => (
+const StatCard = ({ number, label }: { number: string; label: string }) => (
   <div className="text-center p-4">
     <div className="text-5xl font-extrabold text-green-600 mb-2">{number}</div>
     <div className="text-gray-600 text-lg font-medium">{label}</div>
@@ -26,18 +26,23 @@ const StatCard = ({ number, label }) => (
 );
  
 // Feature card
+interface FeatureCardProps {
+  icon: React.ReactElement;
+  title: string;
+  description: string;
+  gradient: string;
+  index: number;
+}
+
 const FeatureCard = ({
   icon,
   title,
   description,
   gradient,
   index,
-  accentColor,
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
+}: FeatureCardProps) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const cardRef = useRef(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -50,13 +55,7 @@ const FeatureCard = ({
     return () => observer.disconnect();
   }, []);
 
-  const handleMouseMove = (e) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setMousePosition({ x, y });
-  };
+  // Removed unused handleMouseMove function
 
   return (
     <div
@@ -69,9 +68,6 @@ const FeatureCard = ({
           index * 0.15
         }s`,
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onMouseMove={handleMouseMove}
     >
       {/* Main card */}
       <div className="relative h-full backdrop-blur-xl bg-white/70 rounded-3xl p-8 border border-white/20 shadow-2xl overflow-hidden transform transition-all duration-700 group-hover:scale-105">
@@ -288,10 +284,10 @@ export const Home = () => {
               <span className="text-green-300 font-bold text-base flex items-center gap-3 justify-center">
                 <Zap className="w-5 h-5 animate-pulse text-green-400" />
                 <span className="relative">
-                  Next-Gen Features
+                  <span>Next-Gen Features</span>
                   <span className="absolute -top-1 -right-8 flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
                   </span>
                 </span>
                 <Leaf className="w-5 h-5 animate-pulse text-emerald-400" />
@@ -333,7 +329,7 @@ export const Home = () => {
           {/* Feature Cards Grid */}
           <div className="relative max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
             {features.map((feature, index) => (
-              <FeatureCard key={index} {...feature} index={index} />
+              <FeatureCard key={feature.title} {...feature} index={index} />
             ))}
           </div>
 

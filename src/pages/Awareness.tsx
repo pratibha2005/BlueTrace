@@ -129,7 +129,9 @@
 
 import { useState } from 'react';
 import { Play, Globe2, Leaf, Users, Award, TrendingDown } from 'lucide-react';
-import SplitText from '../reactBits/SplitText';
+// Importing a JS module without types - use require and any to avoid missing declaration error
+// eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
+const SplitText: any = (require('../reactBits/SplitText')?.default ?? require('../reactBits/SplitText'));
 
 type LanguageCode = 'en' | 'hi' | 'es' | 'fr' | 'de' | 'pt';
 
