@@ -7,6 +7,7 @@ import { Signup } from './pages/Signup';
 import { Calculator } from './pages/Calculator';
  import { Dashboard } from './pages/Dashboard';
 import { Awareness } from './pages/Awareness';
+import Leaderboard from './pages/Leaderboard';
 import './components/Sidebar.css';
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
@@ -30,7 +31,7 @@ function AppRoutes() {
   const location = useLocation(); // 👈 Hook to detect current route
 
   // Pages where navbar should be hidden
-  const hideNavbarRoutes = ['/dashboard', '/login', '/signup'];
+  const hideNavbarRoutes = ['/dashboard', '/login', '/signup', '/leaderboard'];
   const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
 
   return (
@@ -58,6 +59,14 @@ function AppRoutes() {
           }
         />
         <Route path="/awareness" element={<Awareness />} />
+        <Route
+          path="/leaderboard"
+          element={
+            <ProtectedRoute>
+              <Leaderboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );

@@ -9,9 +9,11 @@ import {
   Calendar,
   Target,
   CheckCircle,
+  Crown,
 } from "lucide-react";
 import { badgeAPI } from "../../services/api";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 interface Badge {
   name: string;
@@ -55,8 +57,10 @@ const badgeStyles = [
 ];
 
 export const Badges = () => {
+  const navigate = useNavigate();
   const [badges, setBadges] = useState<Badge[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<'earned' | 'locked'>('earned');
 
   useEffect(() => {
     badgeAPI
@@ -84,8 +88,40 @@ export const Badges = () => {
     0
   );
 
+  // Define all possible badges
+  const allPossibleBadges = [
+    { name: 'First Step', description: 'Complete your first carbon footprint calculation', emissionReduction: 5, requiredAction: 'First calculation', locked: true },
+    { name: 'Eco Warrior', description: 'Reduce 50kg of CO₂ emissions', emissionReduction: 50, requiredAction: 'Save 50kg CO₂', locked: true },
+    { name: 'Green Driver', description: 'Complete 5 green routes', emissionReduction: 25, requiredAction: '5 green trips', locked: true },
+    { name: 'Century Saver', description: 'Save 100kg of CO₂ emissions', emissionReduction: 100, requiredAction: 'Save 100kg CO₂', locked: true },
+    { name: 'Route Master', description: 'Complete 10 optimized routes', emissionReduction: 50, requiredAction: '10 green trips', locked: true },
+    { name: 'Eco Champion', description: 'Reduce 200kg of CO₂ emissions', emissionReduction: 200, requiredAction: 'Save 200kg CO₂', locked: true },
+    { name: 'Climate Hero', description: 'Save 500kg of CO₂ emissions', emissionReduction: 500, requiredAction: 'Save 500kg CO₂', locked: true },
+    { name: 'Frequent Tracker', description: 'Log 20 emission records', emissionReduction: 30, requiredAction: '20 records', locked: true },
+    { name: 'Green Commuter', description: 'Use eco-friendly transport 15 times', emissionReduction: 40, requiredAction: '15 eco trips', locked: true },
+    { name: 'Sustainability Star', description: 'Maintain green habits for 30 days', emissionReduction: 75, requiredAction: '30 day streak', locked: true },
+  ];
+
+  // Mark earned badges as not locked
+  const earnedBadgeNames = badges.map(b => b.name);
+  const badgesWithStatus = allPossibleBadges.map(badge => ({
+    ...badge,
+    locked: !earnedBadgeNames.includes(badge.name),
+    dateEarned: badges.find(b => b.name === badge.name)?.dateEarned || ''
+  }));
+
+  // Filter badges based on selected filter
+  const displayedBadges = filter === 'earned' 
+    ? badgesWithStatus.filter(b => !b.locked)
+    : badgesWithStatus.filter(b => b.locked);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-emerald-50/40 p-4 sm:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 p-4 sm:p-8 relative overflow-hidden">
+      {/* Animated background blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-green-400/20 to-emerald-400/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-br from-teal-400/20 to-cyan-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
       <div className="max-w-[1500px] mx-auto grid lg:grid-cols-[1fr_3fr] gap-10">
         {/* LEFT SIDEBAR */}
         <motion.div
@@ -95,18 +131,20 @@ export const Badges = () => {
           className="lg:sticky lg:top-8 h-fit space-y-8"
         >
           {/* Eco Stats */}
-          <div className="backdrop-blur-2xl bg-white/70 rounded-3xl p-8 shadow-xl border border-white/60">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-              <Leaf className="w-6 h-6 mr-2 text-emerald-600" />
+          <div className="backdrop-blur-2xl bg-white/90 rounded-3xl p-8 shadow-2xl border border-green-100">
+            <h2 className="text-2xl font-black text-gray-900 mb-6 flex items-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-100 to-emerald-200 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                <Leaf className="w-6 h-6 text-emerald-600" />
+              </div>
               Eco Score
             </h2>
 
             <div className="space-y-5">
               {/* Total Badges */}
-              <div className="flex items-center justify-between p-4 bg-white/40 rounded-2xl border border-white/80 shadow-sm">
+              <div className="flex items-center justify-between p-5 bg-white/60 rounded-2xl border border-green-100 shadow-md hover:shadow-xl transition-all hover:scale-105">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
-                    <Award className="w-6 h-6 text-amber-500" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-amber-100 to-yellow-200 rounded-xl flex items-center justify-center shadow-lg">
+                    <Award className="w-7 h-7 text-amber-600" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Total Badges</p>
@@ -118,10 +156,10 @@ export const Badges = () => {
               </div>
 
               {/* CO2 Reduced */}
-              <div className="flex items-center justify-between p-4 bg-white/40 rounded-2xl border border-white/80 shadow-sm">
+              <div className="flex items-center justify-between p-5 bg-white/60 rounded-2xl border border-green-100 shadow-md hover:shadow-xl transition-all hover:scale-105">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                    <Leaf className="w-6 h-6 text-emerald-600" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-green-200 rounded-xl flex items-center justify-center shadow-lg">
+                    <Leaf className="w-7 h-7 text-emerald-600" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">CO₂ Reduced</p>
@@ -134,10 +172,10 @@ export const Badges = () => {
               </div>
 
               {/* Rank */}
-              <div className="flex items-center justify-between p-4 bg-white/40 rounded-2xl border border-white/80 shadow-sm">
+              <div className="flex items-center justify-between p-5 bg-white/60 rounded-2xl border border-green-100 shadow-md hover:shadow-xl transition-all hover:scale-105">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                    <Trophy className="w-6 h-6 text-purple-500" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-purple-100 to-fuchsia-200 rounded-xl flex items-center justify-center shadow-lg">
+                    <Trophy className="w-7 h-7 text-purple-600" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Eco Rank</p>
@@ -151,8 +189,9 @@ export const Badges = () => {
           </div>
 
           {/* Next Milestone */}
-          <div className="backdrop-blur-2xl bg-white/80 rounded-3xl p-8 shadow-xl border border-white/60">
-            <p className="text-xl font-semibold text-emerald-700 mb-2">
+          <div className="backdrop-blur-2xl bg-white/90 rounded-3xl p-8 shadow-2xl border border-green-100">
+            <p className="text-xl font-black text-emerald-700 mb-2 flex items-center gap-2">
+              <Target className="w-6 h-6" />
               Next Milestone
             </p>
             <p className="text-sm text-gray-600 mb-5">
@@ -173,6 +212,27 @@ export const Badges = () => {
               <span className="font-semibold text-emerald-600">60% complete</span>
             </div>
           </div>
+
+          {/* Leaderboard Button */}
+          <motion.button
+            onClick={() => navigate('/leaderboard')}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full backdrop-blur-2xl bg-gradient-to-r from-purple-500 via-blue-500 to-green-500 rounded-3xl p-8 shadow-xl border border-white/60 text-white group cursor-pointer hover:shadow-2xl transition-all"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition">
+                  <Crown className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="text-xl font-bold">View Leaderboard</p>
+                  <p className="text-sm text-white/80">Compete with eco-warriors!</p>
+                </div>
+              </div>
+              <TrendingUp className="w-6 h-6 text-white group-hover:translate-x-1 transition" />
+            </div>
+          </motion.button>
         </motion.div>
 
         {/* MAIN BADGE CONTENT */}
@@ -182,35 +242,59 @@ export const Badges = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            className="text-center mb-4"
           >
-            <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
-              <Star className="inline w-8 h-8 mr-2 text-yellow-500" />
-              Achievement Gallery
-            </h1>
-            <p className="text-gray-600 text-lg">
-              A timeline of your positive impact.
+            <div className="flex items-center justify-center gap-4 mb-3">
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="w-16 h-16 bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-500 rounded-3xl flex items-center justify-center shadow-2xl"
+              >
+                <Star className="text-white" size={32} />
+              </motion.div>
+              <h1 className="text-5xl font-black bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                Achievement Gallery
+              </h1>
+            </div>
+            <p className="text-gray-700 text-lg font-semibold">
+              A timeline of your positive impact 🌱
             </p>
           </motion.div>
 
           {/* Filter Buttons */}
-          <div className="flex items-center justify-between backdrop-blur-xl bg-white/60 p-4 rounded-2xl border border-white/70 shadow">
-            <h3 className="text-xl font-bold text-gray-900">
-              All Badges ({badges.length})
+          <div className="flex items-center justify-between backdrop-blur-xl bg-white/90 p-6 rounded-3xl border border-green-100 shadow-xl">
+            <h3 className="text-2xl font-black text-gray-900 flex items-center gap-2">
+              <Award className="w-6 h-6 text-green-600" />
+              {filter === 'earned' ? `Earned Badges (${badges.length})` : `Locked Badges (${badgesWithStatus.filter(b => b.locked).length})`}
             </h3>
-            <div className="flex gap-2">
-              <button className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm shadow hover:bg-emerald-700">
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setFilter('earned')}
+                className={`px-6 py-3 rounded-xl text-sm font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all ${
+                  filter === 'earned' 
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' 
+                    : 'bg-white/70 backdrop-blur-sm text-gray-700 border-2 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
                 <CheckCircle className="inline w-4 h-4 mr-1" /> Earned
               </button>
-              <button className="px-4 py-2 bg-white/40 backdrop-blur-sm text-gray-700 rounded-xl border border-gray-300/50 text-sm">
-                Locked
+              <button 
+                onClick={() => setFilter('locked')}
+                className={`px-6 py-3 rounded-xl text-sm font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all ${
+                  filter === 'locked' 
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' 
+                    : 'bg-white/70 backdrop-blur-sm text-gray-700 border-2 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                🔒 Locked
               </button>
             </div>
           </div>
 
           {/* BADGES GRID */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {badges.length ? (
-              badges.map((badge, index) => {
+            {displayedBadges.length ? (
+              displayedBadges.map((badge, index) => {
                 const style = badgeStyles[index % badgeStyles.length];
                 const IconComponent = style.icon;
 
@@ -219,15 +303,26 @@ export const Badges = () => {
                     key={index}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    whileHover={{ scale: 1.04, y: -4 }}
+                    whileHover={{ scale: badge.locked ? 1.02 : 1.08, y: badge.locked ? -2 : -8 }}
                     transition={{ duration: 0.3 }}
-                    className={`p-6 rounded-3xl shadow-xl border border-white/70 backdrop-blur-2xl 
-                      bg-gradient-to-br ${style.gradient} ring-1 ${style.ring} group cursor-pointer`}
+                    className={`p-7 rounded-3xl shadow-2xl border-2 backdrop-blur-2xl 
+                      bg-gradient-to-br ${style.gradient} ring-2 ${style.ring} group cursor-pointer hover:shadow-3xl ${
+                        badge.locked ? 'opacity-60 grayscale' : 'border-white/70'
+                      }`}
                   >
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-20 h-20 bg-white/40 backdrop-blur-xl rounded-2xl flex items-center justify-center mb-4 shadow-inner group-hover:scale-110 transition">
-                        <IconComponent className="w-10 h-10 text-gray-700" />
-                      </div>
+                    <div className="flex flex-col items-center text-center relative">
+                      {badge.locked && (
+                        <div className="absolute top-0 right-0 w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center">
+                          <span className="text-lg">🔒</span>
+                        </div>
+                      )}
+                      <motion.div
+                        whileHover={{ rotate: badge.locked ? 0 : 360 }}
+                        transition={{ duration: 0.5 }}
+                        className="w-24 h-24 bg-white/50 backdrop-blur-xl rounded-3xl flex items-center justify-center mb-4 shadow-xl group-hover:scale-110 transition"
+                      >
+                        <IconComponent className="w-12 h-12 text-gray-700" />
+                      </motion.div>
 
                       <h4 className="font-bold text-gray-900 text-lg">
                         {badge.name}
@@ -240,10 +335,16 @@ export const Badges = () => {
                         <span className="flex items-center gap-1 text-emerald-600 font-medium">
                           <Leaf className="w-3 h-3" />-{badge.emissionReduction}kg
                         </span>
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(badge.dateEarned).toLocaleDateString()}
-                        </span>
+                        {badge.locked ? (
+                          <span className="flex items-center gap-1 text-gray-600 font-medium">
+                            🎯 {badge.requiredAction}
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(badge.dateEarned).toLocaleDateString()}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -253,10 +354,12 @@ export const Badges = () => {
               <div className="col-span-full p-20 rounded-3xl text-center backdrop-blur-xl bg-white/60 border border-white/70 shadow-lg">
                 <Award className="w-14 h-14 mx-auto text-gray-400 mb-4" />
                 <p className="text-xl font-semibold text-gray-700">
-                  No badges earned yet
+                  {filter === 'earned' ? 'No badges earned yet' : 'All badges unlocked!'}
                 </p>
                 <p className="text-gray-500 mt-1">
-                  Start your eco-journey to unlock achievements.
+                  {filter === 'earned' 
+                    ? 'Start your eco-journey to unlock achievements.' 
+                    : 'Congratulations! You\'ve earned all available badges.'}
                 </p>
               </div>
             )}
@@ -266,10 +369,12 @@ export const Badges = () => {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-8 backdrop-blur-2xl bg-white/70 rounded-3xl shadow-xl border border-white/60"
+            className="p-8 backdrop-blur-2xl bg-white/90 rounded-3xl shadow-2xl border border-green-100"
           >
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-              <TrendingUp className="w-6 h-6 mr-2 text-purple-500" />
+            <h3 className="text-2xl font-black text-gray-900 mb-6 flex items-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-fuchsia-200 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                <TrendingUp className="w-6 h-6 text-purple-600" />
+              </div>
               Latest Unlocks
             </h3>
 
@@ -277,12 +382,12 @@ export const Badges = () => {
               {badges.slice(0, 3).map((b, i) => (
                 <motion.div
                   key={i}
-                  whileHover={{ scale: 1.03 }}
-                  className="p-4 rounded-2xl bg-white/70 backdrop-blur-xl border border-white shadow"
+                  whileHover={{ scale: 1.05, y: -4 }}
+                  className="p-5 rounded-2xl bg-white/80 backdrop-blur-xl border-2 border-green-100 shadow-lg hover:shadow-xl transition-all"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center">
-                      <Award className="w-7 h-7 text-emerald-600" />
+                    <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-green-200 rounded-2xl flex items-center justify-center shadow-lg">
+                      <Award className="w-8 h-8 text-emerald-600" />
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-900">{b.name}</h4>

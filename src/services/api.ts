@@ -289,3 +289,19 @@ export const routeOptimizerAPI = {
     return handleResponse(response);
   }
 };
+
+export const leaderboardAPI = {
+  getLeaderboard: async () => {
+    const response = await fetch(`${API_BASE_URL}/leaderboard`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  },
+
+  getUserStats: async (userId: string) => {
+    const response = await fetch(`${API_BASE_URL}/leaderboard/user/${userId}`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  }
+};

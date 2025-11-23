@@ -9,8 +9,10 @@ import {
   Video,
   Bot,
   Navigation,
+  Trophy,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const navItems = [
   { id: "overview", icon: LayoutDashboard, label: "Overview" },
@@ -19,6 +21,7 @@ const navItems = [
   { id: "route-optimizer", icon: Navigation, label: "Route Optimizer" },
   { id: "awareness", icon: Video, label: "Awareness Videos" },
   { id: "badges", icon: Award, label: "Badges" },
+  { id: "leaderboard", icon: Trophy, label: "Leaderboard", external: true },
   { id: "profile", icon: Send, label: "Profile" },
 ];
 
@@ -28,6 +31,7 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ active, onSelect }: SidebarProps) => {
+  const navigate = useNavigate();
   const isFirstActive = active === navItems[0].id;
   const isLastActive = active === navItems[navItems.length - 1].id;
 
@@ -79,7 +83,13 @@ export const Sidebar = ({ active, onSelect }: SidebarProps) => {
               className="group relative z-10"
             >
               <button
-                onClick={() => onSelect(item.id)}
+                onClick={() => {
+                  if (item.external) {
+                    navigate('/leaderboard');
+                  } else {
+                    onSelect(item.id);
+                  }
+                }}
                 className={`relative w-12 h-12 flex items-center justify-center transition-all duration-200 ${
                   isActive 
                     ? `bg-white shadow-lg scale-110 ${

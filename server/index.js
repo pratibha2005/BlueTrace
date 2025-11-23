@@ -12,6 +12,7 @@ const aiVideoRoutes = require('./routes/aiVideo');
 const elevenLabsAudioRoutes = require('./routes/elevenLabsAudio');
 const ecobotRoutes = require('./routes/ecobot');
 const routeOptimizerRoutes = require('./routes/routeOptimizer');
+const leaderboardRoutes = require('./routes/leaderboard');
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api/ai-video', aiVideoRoutes);
 app.use('/api/elevenlabs', elevenLabsAudioRoutes);
 app.use('/api/ecobot', ecobotRoutes);
 app.use('/api/route-optimizer', routeOptimizerRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'BlueTrace API is running' });
