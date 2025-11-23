@@ -130,7 +130,7 @@
 import { useState } from 'react';
 import { Play, Globe2, Leaf, Users, Award, TrendingDown } from 'lucide-react';
 // @ts-ignore - JSX file without types
-import SplitText from '../reactBits/SplitText';
+import SplitText from '../ReactBits/SplitText';
 
 type LanguageCode = 'en' | 'hi' | 'es' | 'fr' | 'de' | 'pt';
 

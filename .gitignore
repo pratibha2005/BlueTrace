@@ -37,3 +37,4 @@ server/.env
 *.cab
 Microsoft.WebView2*
 
+.vercel
