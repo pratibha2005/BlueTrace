@@ -50,7 +50,7 @@ export const Sidebar = ({ active, onSelect }: SidebarProps) => {
       {/* Mobile Hamburger Button */}
       <button
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        className="fixed top-4 left-4 z-50 lg:hidden w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all"
+        className="fixed top-4 left-4 z-50 xl:hidden w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all"
       >
         {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
@@ -64,14 +64,14 @@ export const Sidebar = ({ active, onSelect }: SidebarProps) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+              className="fixed inset-0 bg-black/50 z-40 xl:hidden"
             />
             <motion.div
               initial={{ x: -280 }}
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: "spring", damping: 25 }}
-              className="fixed left-0 top-0 h-full w-64 bg-white shadow-2xl z-40 lg:hidden flex flex-col"
+              className="fixed left-0 top-0 h-full w-64 bg-white shadow-2xl z-40 xl:hidden flex flex-col"
             >
               {/* Mobile Logo */}
               <div className="p-6 border-b border-gray-200">
@@ -129,7 +129,7 @@ export const Sidebar = ({ active, onSelect }: SidebarProps) => {
         initial={{ x: -20, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className="hidden lg:flex relative h-screen flex-col items-center bg-gray-50 shadow-2xl select-none"
+        className="hidden xl:flex relative h-screen flex-col items-center bg-gray-50 shadow-2xl select-none"
       >
       {/* LOGO - at very top */}
       <motion.div 
