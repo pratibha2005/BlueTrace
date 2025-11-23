@@ -28,32 +28,47 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ active, onSelect }: SidebarProps) => {
+  const isFirstActive = active === navItems[0].id;
+  const isLastActive = active === navItems[navItems.length - 1].id;
+
   return (
     <motion.div 
       initial={{ x: -20, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="relative h-screen w-[90px] flex flex-col items-center justify-center bg-gray-50 shadow-2xl select-none"
+      className="relative h-screen flex flex-col items-center bg-gray-50 shadow-2xl select-none"
     >
-      {/* NAVIGATION SECTION - centered vertically with gradient background covering logo + icons */}
-      <div className="relative flex flex-col items-center justify-center gap-8 py-12 z-10">
-        {/* Curved gradient background for logo and all navigation icons */}
-        <div className=" absolute inset-0 bg-gradient-to-b from-emerald-600 via-teal-600 to-green-700 z-0" style={{ borderRadius: '0 100px 100px 0', left: '-20px', right: '0' }}></div>
+      {/* LOGO - at very top */}
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="flex-shrink-0 pt-6 pb-4"
+      >
+        <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-emerald-100 shadow-lg hover:bg-emerald-200 transition-all duration-200 cursor-pointer group">
+          <Leaf className="w-6 h-6 text-emerald-600" />
+        </div>
+      </motion.div>
+
+      {/* NAVIGATION SECTION - centered with gradient background */}
+      <div className="relative flex-1 flex flex-col items-center justify-center gap-3">
+        {/* Curved gradient background for navigation icons */}
+        <div className="absolute bg-gradient-to-b from-emerald-600 via-teal-600 to-green-700 z-0" style={{ 
+          borderRadius: '0 80px 80px 0', 
+          left: '-20px', 
+          right: '0', 
+          top: '26px', 
+          bottom: '26px', 
+          paddingLeft: '20px',
+          width: 'calc(100% + 20px)'
+        }}></div>
         
-        {/* LOGO - at top of navigation section */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-          className="mb-4 relative z-10"
-        >
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-white/20 backdrop-blur-sm shadow-lg hover:bg-white/30 transition-all duration-200 cursor-pointer group border border-white/30">
-            <Leaf className="w-6 h-6 text-white" />
-          </div>
-        </motion.div>
+        {/* Navigation Items */}
         {navItems.map((item, index) => {
           const Icon = item.icon;
           const isActive = active === item.id;
+          const isFirst = index === 0;
+          const isLast = index === navItems.length - 1;
 
           return (
             <motion.div
@@ -65,10 +80,14 @@ export const Sidebar = ({ active, onSelect }: SidebarProps) => {
             >
               <button
                 onClick={() => onSelect(item.id)}
-                className={`relative w-12 h-12 flex items-center justify-center rounded-xl transition-all duration-200 ${
+                className={`relative w-12 h-12 flex items-center justify-center transition-all duration-200 ${
                   isActive 
-                    ? "bg-white shadow-lg scale-110" 
-                    : "hover:bg-white/10"
+                    ? `bg-white shadow-lg scale-110 ${
+                        isFirst ? 'rounded-tl-xl rounded-tr-xl rounded-bl-none rounded-br-xl' : 
+                        isLast ? 'rounded-tl-xl rounded-tr-none rounded-bl-xl rounded-br-xl' : 
+                        'rounded-xl'
+                      }` 
+                    : "hover:bg-white/10 rounded-xl"
                 }`}
               >
                 <Icon
@@ -90,12 +109,12 @@ export const Sidebar = ({ active, onSelect }: SidebarProps) => {
         })}
       </div>
 
-      {/* LOGOUT - at bottom absolute */}
+      {/* LOGOUT - at bottom */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 group"
+        className="group relative z-10 flex-shrink-0 pb-6 pt-4"
       >
         <button 
           onClick={() => {

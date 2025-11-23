@@ -7,6 +7,9 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+server/node_modules
+server/node_modules
+server/node_modules
 dist
 dist-ssr
 *.local
@@ -21,6 +24,15 @@ dist-ssr
 *.sln
 *.sw?
 .env
+.env.local
+.env.production
+server/.env
+.env.local
+.env.production
+server/.env
+.env.local
+.env.production
+server/.env
 
 *.cab
 Microsoft.WebView2*

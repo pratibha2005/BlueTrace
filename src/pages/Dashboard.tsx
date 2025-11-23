@@ -37,7 +37,11 @@ export const Dashboard = () => {
         </AnimatePresence>
       </main>
 
-      <ProfilePanel stats={stats} isLoading={isLoading} />
+      <ProfilePanel 
+        stats={stats} 
+        isLoading={isLoading}
+        onProfileClick={() => setActiveSection("profile")}
+      />
 
     </div>
   );

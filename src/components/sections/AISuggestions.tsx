@@ -102,11 +102,11 @@ export const AISuggestions = () => {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Sparkles className="w-7 h-7 text-white" />
+                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Lightbulb className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-5xl font-bold bg-gradient-to-r from-gray-900 via-amber-800 to-yellow-700 bg-clip-text text-transparent">
+                  <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-700 bg-clip-text text-transparent">
                     AI Suggestions
                   </h1>
                   <p className="text-gray-600 text-lg mt-1">

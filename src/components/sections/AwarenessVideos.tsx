@@ -677,30 +677,29 @@ export const AwarenessVideos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 p-8">
+    <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header with floating gradient animation */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-10 relative"
+          className="mb-10"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 via-pink-400/20 to-rose-400/20 blur-3xl -z-10" />
-          <div className="flex items-center justify-center gap-4 mb-6">
+          <div className="flex items-center gap-4 mb-6">
             <motion.div 
-              animate={{ rotate: [0, 10, -10, 0] }}
+              animate={{ rotate: [0, 5, -5, 0] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              className="w-20 h-20 bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 rounded-3xl flex items-center justify-center shadow-2xl"
+              className="w-16 h-16 bg-gradient-to-br from-emerald-500 via-teal-600 to-green-600 rounded-2xl flex items-center justify-center shadow-lg"
             >
-              <Wand2 className="w-10 h-10 text-white" />
+              <Video className="w-8 h-8 text-white" />
             </motion.div>
-            <div className="text-center">
-              <h1 className="text-5xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-2">
-                AI Video Generator
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-teal-700 bg-clip-text text-transparent mb-1">
+                Awareness Videos
               </h1>
-              <p className="text-gray-600 text-xl font-medium">
-                Generate educational videos in any language with AI ✨
+              <p className="text-gray-600 text-lg">
+                Generate educational videos in any language with AI
               </p>
             </div>
           </div>
@@ -708,27 +707,27 @@ export const AwarenessVideos = () => {
           {/* Video Generator Form */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             {/* Left: Topic Selection */}
-            <div className="lg:col-span-2 bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-purple-100">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-white" />
+            <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
+                  <BookOpen className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">Choose a Topic</h3>
+                <h3 className="text-xl font-bold text-gray-900">Choose a Topic</h3>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {VIDEO_TOPICS.map((topic) => {
                   const Icon = topic.icon;
                   return (
                     <motion.button
                       key={topic.id}
                       onClick={() => setSelectedTopic(topic.id)}
-                      whileHover={{ scale: 1.03 }}
+                      whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`p-5 rounded-2xl border-2 transition-all duration-300 text-left relative overflow-hidden group ${
+                      className={`p-4 rounded-xl border-2 transition-all duration-300 text-left group ${
                         selectedTopic === topic.id
-                          ? 'border-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 shadow-xl'
-                          : 'border-gray-200 bg-white hover:border-purple-300 hover:shadow-lg'
+                          ? 'border-emerald-500 bg-emerald-50 shadow-md'
+                          : 'border-gray-200 bg-white hover:border-emerald-300 hover:shadow-sm'
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -740,7 +739,7 @@ export const AwarenessVideos = () => {
                           <p className="text-sm text-gray-600">{topic.description}</p>
                         </div>
                         {selectedTopic === topic.id && (
-                          <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0" />
+                          <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0" />
                         )}
                       </div>
                     </motion.button>
@@ -750,7 +749,7 @@ export const AwarenessVideos = () => {
             </div>
 
             {/* Right: Language Input */}
-            <div className="bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 rounded-3xl p-6 shadow-xl text-white">
+            <div className="bg-gradient-to-br from-emerald-500 via-teal-600 to-green-600 rounded-2xl p-6 shadow-lg text-white">
               <div className="flex items-center gap-3 mb-6">
                 <Globe className="w-6 h-6" />
                 <h3 className="text-xl font-bold">Your Language</h3>
@@ -789,7 +788,7 @@ export const AwarenessVideos = () => {
                 disabled={!selectedTopic || !userLanguage.trim() || isGenerating}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full py-5 bg-white text-purple-600 rounded-2xl font-bold shadow-2xl hover:shadow-3xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group"
+                className="w-full py-4 bg-white text-emerald-600 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group"
               >
                 {isGenerating ? (
                   <>

@@ -115,9 +115,6 @@ export default function EcoBot() {
         setUserStats(response.userStats);
       }
 
-      // Speak the response if supported
-      speakResponse(response.response);
-
     } catch (error: any) {
       const errorMessage: Message = {
         role: 'assistant',
@@ -127,16 +124,6 @@ export default function EcoBot() {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const speakResponse = (text: string) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = language === 'Hindi' ? 'hi-IN' : language === 'Tamil' ? 'ta-IN' : 'en-US';
-      utterance.rate = 0.9;
-      utterance.pitch = 1;
-      window.speechSynthesis.speak(utterance);
     }
   };
 
