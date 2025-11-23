@@ -249,18 +249,26 @@ export const ProfilePanel = ({ stats, isLoading, onProfileClick }: ProfilePanelP
             <div className="flex items-center justify-between mb-4">
               <div className="flex-1 min-w-0 mr-3">
                 <h4 className="font-bold text-gray-800 text-base truncate">Monthly Goal</h4>
-                <p className="text-xs text-gray-500 mt-0.5 truncate">Reduce emissions by 30%</p>
+                <p className="text-xs text-gray-500 mt-0.5 truncate">Track your progress</p>
               </div>
               <div className="text-right flex-shrink-0">
-                <span className="text-xl font-extrabold text-green-600">73%</span>
-                <p className="text-xs text-gray-500">Done</p>
+                <span className="text-xl font-extrabold text-green-600">{stats?.totalTrips || 0}</span>
+                <p className="text-xs text-gray-500">Trips</p>
               </div>
             </div>
             <div className="relative h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner mb-3">
-              <div className="absolute inset-0 h-full w-3/4 bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 rounded-full"></div>
-              <div className="absolute inset-0 h-full w-3/4 bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 rounded-full animate-pulse opacity-50"></div>
+              <div 
+                className="absolute inset-0 h-full bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 rounded-full"
+                style={{ width: `${Math.min((stats?.totalTrips || 0) * 10, 100)}%` }}
+              ></div>
+              <div 
+                className="absolute inset-0 h-full bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 rounded-full animate-pulse opacity-50"
+                style={{ width: `${Math.min((stats?.totalTrips || 0) * 10, 100)}%` }}
+              ></div>
             </div>
-            <p className="text-xs text-center text-gray-700 font-semibold">Keep going! 🎯</p>
+            <p className="text-xs text-center text-gray-700 font-semibold">
+              {(stats?.totalTrips || 0) > 0 ? 'Keep going! 🎯' : 'Start tracking your trips! 🚀'}
+            </p>
           </motion.div>
         </div>
 
