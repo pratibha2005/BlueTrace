@@ -1066,16 +1066,18 @@ export const AwarenessVideos = () => {
                               </motion.div>
                             </div>
 
-                            {/* Scene Counter */}
+                            {/* HD Video Badge */}
                             <motion.div
                               initial={{ x: 100, opacity: 0 }}
                               animate={{ x: 0, opacity: 1 }}
-                              className="absolute top-6 right-6 bg-black/60 backdrop-blur-md px-5 py-3 rounded-full border border-white/20"
+                              className="absolute top-6 right-6 bg-red-600/80 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2"
                             >
-                              <span className="text-white text-sm font-bold flex items-center gap-2">
-                                <Video className="w-4 h-4" />
-                                Scene {currentScene + 1} / {selectedVideo.scenes.length}
-                              </span>
+                              <motion.div
+                                animate={{ opacity: [1, 0.4, 1] }}
+                                transition={{ duration: 1.5, repeat: Infinity }}
+                                className="w-2 h-2 bg-white rounded-full"
+                              />
+                              <span className="text-white text-sm font-bold">LIVE</span>
                             </motion.div>
 
                             {/* Audio Indicator */}
@@ -1187,10 +1189,11 @@ export const AwarenessVideos = () => {
                             </div>
 
                             <div className="flex items-center gap-3">
-                              {/* Scene Counter */}
-                              <div className="bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-lg">
-                                <span className="text-white text-xs font-medium">
-                                  Scene {currentScene + 1}/{selectedVideo.scenes.length}
+                              {/* Quality Badge */}
+                              <div className="bg-purple-500/20 backdrop-blur-md px-3 py-1.5 rounded-lg border border-purple-500/30">
+                                <span className="text-purple-300 text-xs font-medium flex items-center gap-1">
+                                  <Sparkles className="w-3 h-3" />
+                                  HD Quality
                                 </span>
                               </div>
 
@@ -1268,51 +1271,6 @@ export const AwarenessVideos = () => {
                     </div>
                   </div>
 
-                  {/* Voice Support Info */}
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-4">
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" />
-                      <div className="text-sm text-gray-700">
-                        <strong>Audio Narration:</strong> 
-                        {selectedVideo.romanizedScript ? (
-                          <p className="mt-1">
-                            ✅ This video includes romanized pronunciation! Since {selectedVideo.language} voices may not be available on all devices, 
-                            we've generated a romanized version that English voices can pronounce. The native {selectedVideo.language} script is displayed in the video.
-                          </p>
-                        ) : (
-                          <>
-                            <p className="mt-1">
-                              The audio works best when you have {selectedVideo.language} voices installed on your device.
-                            </p>
-                            <ul className="list-disc ml-5 mt-2 space-y-1 text-xs">
-                              <li>Windows: Settings → Time & Language → Speech → Add voices</li>
-                              <li>Android/iOS: System voices usually support regional languages</li>
-                              <li>Chrome has better voice support than other browsers</li>
-                            </ul>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4">
-                    <div className="flex items-start gap-3">
-                      <Sparkles className="w-5 h-5 text-purple-600 flex-shrink-0 mt-1" />
-                      <div className="text-sm text-gray-700">
-                        <strong>🎙️ Premium AI Audio by ElevenLabs:</strong> This video uses:
-                        <ul className="list-disc ml-5 mt-2 space-y-1">
-                          <li><strong>Groq AI (FREE)</strong> - Generates educational content in <strong>{selectedVideo.language}</strong></li>
-                          <li><strong>ElevenLabs (Premium)</strong> - Natural, human-like text-to-speech with Eleven Multilingual v2 model</li>
-                          <li>Supports ALL Indian languages: Hindi, Tamil, Telugu, Malayalam, Kannada, Bengali, Marathi, Gujarati, Punjabi, Odia, Urdu, Assamese, and more!</li>
-                          <li>Also supports 29+ world languages with perfect native pronunciation</li>
-                          <li>Realistic voice quality that sounds like a real person speaking</li>
-                        </ul>
-                        <p className="mt-2 text-xs text-purple-700 font-semibold">
-                          🌟 Professional-grade audio narration with authentic pronunciation!
-                        </p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </motion.div>
             </motion.div>

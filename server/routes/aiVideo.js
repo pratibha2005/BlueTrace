@@ -12,6 +12,9 @@ const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 // Pexels API for video clips
 const PEXELS_API_KEY = process.env.PEXELS_API_KEY || 'WKuzmVrYQYbC6qFdlS1ycY5tKQWsqCYQkIjF9j3rF3jQPXhQhQhhqWLd';
 
+// Pixabay API (Free alternative - no API key limits)
+const PIXABAY_API_KEY = process.env.PIXABAY_API_KEY || '47972888-4fd1aa7aa808f168e3e87f6b8';
+
 // Helper function to call Google Gemini API
 async function queryGemini(prompt, systemPrompt = '') {
   const fullPrompt = systemPrompt ? `${systemPrompt}\n\n${prompt}` : prompt;
@@ -263,7 +266,41 @@ Together, we can build a cleaner, greener future for generations to come.
 [This content is AI-generated in ${language} language]`;
 }
 
-// Helper function to fetch video clips from Pexels
+// Helper function to fetch video clips from Pixabay (Primary)
+async function fetchPixabayVideos(query, count = 6) {
+  try {
+    const response = await fetch(`https://pixabay.com/api/videos/?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(query)}&per_page=${count}&orientation=horizontal&video_type=film`);
+    
+    if (!response.ok) {
+      console.log(`Pixabay API failed for query: ${query}`);
+      return null;
+    }
+    
+    const data = await response.json();
+    
+    // Convert Pixabay format to match our structure
+    if (data.hits && data.hits.length > 0) {
+      return data.hits.map(video => ({
+        id: video.id,
+        video_files: [{
+          link: video.videos.medium.url || video.videos.small.url,
+          quality: 'hd',
+          width: video.videos.medium.width || video.videos.small.width,
+          height: video.videos.medium.height || video.videos.small.height
+        }],
+        image: video.picture_id ? `https://i.vimeocdn.com/video/${video.picture_id}_640x360.jpg` : video.userImageURL,
+        duration: video.duration,
+        user: video.user
+      }));
+    }
+    return [];
+  } catch (error) {
+    console.error('Pixabay fetch error:', error.message);
+    return null;
+  }
+}
+
+// Helper function to fetch video clips from Pexels (Fallback)
 async function fetchPexelsVideos(query, count = 6) {
   try {
     const response = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=${count}&orientation=landscape`, {
@@ -306,10 +343,18 @@ async function generateVideoScenes(topic, script, language) {
     searchQuery = 'people community environment nature';
   }
   
-  // Fetch video clips from Pexels (with fallback to images)
-  let videos = await fetchPexelsVideos(searchQuery, 8);
+  // Fetch video clips from Pixabay first, then Pexels as fallback
+  let videos = await fetchPixabayVideos(searchQuery, 8);
+  
   if (!videos || videos.length === 0) {
-    console.log('Pexels videos not available, will use fallback images');
+    console.log('Pixabay videos not available, trying Pexels...');
+    videos = await fetchPexelsVideos(searchQuery, 8);
+  }
+  
+  if (!videos || videos.length === 0) {
+    console.log('No videos available from Pixabay or Pexels, will use fallback images');
+  } else {
+    console.log(`Found ${videos.length} videos for topic: ${topic}`);
   }
   
   // Fallback images if Pexels fails
@@ -408,13 +453,17 @@ async function generateVideoScenes(topic, script, language) {
     // Use video if available, otherwise fallback to image
     let mediaUrl = images[index % images.length];
     let mediaType = 'image';
+    let videoThumbnail = images[index % images.length];
     
     if (videos && videos.length > 0) {
       const video = videos[index % videos.length];
-      // Get medium quality video file (720p)
+      // Get best quality video file
       const videoFile = video.video_files.find(f => f.quality === 'hd' || f.quality === 'sd') || video.video_files[0];
       mediaUrl = videoFile.link;
       mediaType = 'video';
+      videoThumbnail = video.image;
+      
+      console.log(`Scene ${index + 1}: Using video from ${mediaUrl}`);
     }
     
     return {
@@ -423,7 +472,7 @@ async function generateVideoScenes(topic, script, language) {
       icon: icons[index % icons.length],
       media: mediaUrl,
       mediaType: mediaType, // 'video' or 'image'
-      image: mediaType === 'image' ? mediaUrl : video.image, // Keep image for backward compatibility
+      image: videoThumbnail, // Thumbnail for video or fallback image
       duration: 8, // seconds per scene
       animation: animation,
       background: `gradient-${(index % 5) + 1}`,
