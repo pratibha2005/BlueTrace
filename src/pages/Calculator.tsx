@@ -89,25 +89,25 @@ export const Calculator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white py-12 px-4">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white py-6 sm:py-8 lg:py-12 px-3 sm:px-4">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-start lg:items-center">
         
         {/* Left - Form card */}
-        <div className="bg-white rounded-3xl shadow-xl p-8">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white">
-              <CalcIcon className="w-7 h-7" />
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl p-5 sm:p-6 lg:p-8">
+          <div className="flex items-center gap-3 sm:gap-4 mb-5 sm:mb-6">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white flex-shrink-0">
+              <CalcIcon className="w-6 h-6 sm:w-7 sm:h-7" />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Carbon Calculator</h1>
-              <p className="text-sm text-gray-500">Estimate CO₂ emissions for your trip</p>
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">Carbon Calculator</h1>
+              <p className="text-xs sm:text-sm text-gray-500 truncate">Estimate CO₂ emissions for your trip</p>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Vehicle Type</label>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+              <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">Vehicle Type</label>
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3">
                 {vehicleTypes.map(v => {
                   const Icon = v.icon;
                   const active = vehicleType === v.value;
@@ -116,14 +116,14 @@ export const Calculator = () => {
                       key={v.value}
                       type="button"
                       onClick={() => setVehicleType(v.value)}
-                      className={`p-3 rounded-xl border transition flex flex-col items-center gap-2 ${
+                      className={`p-2 sm:p-3 rounded-lg sm:rounded-xl border transition flex flex-col items-center gap-1.5 sm:gap-2 ${
                         active ? 'bg-emerald-50 border-emerald-300 shadow-sm scale-105' : 'bg-white border-gray-200 hover:shadow-sm'
                       }`}
                     >
-                      <div className={`w-8 h-8 rounded-md flex items-center justify-center ${active ? 'bg-emerald-100' : 'bg-gray-100'}`}>
-                        <Icon className="w-5 h-5 text-gray-700"/>
+                      <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-md flex items-center justify-center ${active ? 'bg-emerald-100' : 'bg-gray-100'}`}>
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700"/>
                       </div>
-                      <span className="text-xs font-medium text-gray-700">{v.label}</span>
+                      <span className="text-[10px] sm:text-xs font-medium text-gray-700 truncate w-full text-center">{v.label}</span>
                     </button>
                   );
                 })}
@@ -131,65 +131,65 @@ export const Calculator = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Fuel Type</label>
-              <select value={fuelType} onChange={(e) => setFuelType(e.target.value)} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Fuel Type</label>
+              <select value={fuelType} onChange={(e) => setFuelType(e.target.value)} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200">
                 {fuelTypes.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
               </select>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label className="block text-sm text-gray-700 mb-2">Fuel Consumption ({fuelType === 'electric' ? 'kWh/100km' : 'L/100km'})</label>
-                <input type="number" step="0.01" value={fuelConsumption} onChange={(e) => setFuelConsumption(e.target.value)} placeholder="e.g., 6.5" required className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-200" />
+                <label className="block text-xs sm:text-sm text-gray-700 mb-1.5 sm:mb-2">Fuel Consumption ({fuelType === 'electric' ? 'kWh/100km' : 'L/100km'})</label>
+                <input type="number" step="0.01" value={fuelConsumption} onChange={(e) => setFuelConsumption(e.target.value)} placeholder="e.g., 6.5" required className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-emerald-200" />
               </div>
               <div>
-                <label className="block text-sm text-gray-700 mb-2">Distance (km)</label>
-                <input type="number" step="0.1" value={distance} onChange={(e) => setDistance(e.target.value)} placeholder="e.g., 45" required className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-200" />
+                <label className="block text-xs sm:text-sm text-gray-700 mb-1.5 sm:mb-2">Distance (km)</label>
+                <input type="number" step="0.1" value={distance} onChange={(e) => setDistance(e.target.value)} placeholder="e.g., 45" required className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-emerald-200" />
               </div>
             </div>
 
             {error && <div className="text-sm text-red-700 bg-red-50 px-4 py-2 rounded">{error}</div>}
 
-            <div className="flex gap-4">
-              <button type="submit" disabled={loading} className="flex-1 bg-emerald-500 text-white py-3 rounded-2xl font-semibold hover:bg-emerald-600 transition disabled:opacity-50">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <button type="submit" disabled={loading} className="flex-1 bg-emerald-500 text-white py-2.5 sm:py-3 text-sm sm:text-base rounded-xl sm:rounded-2xl font-semibold hover:bg-emerald-600 transition disabled:opacity-50">
                 {loading ? 'Calculating...' : 'Calculate'}
               </button>
-              <button type="button" onClick={() => { setFuelConsumption(''); setDistance(''); setError(''); setAiSuggestion(''); }} className="px-6 py-3 rounded-2xl border border-gray-200 bg-white">Reset</button>
+              <button type="button" onClick={() => { setFuelConsumption(''); setDistance(''); setError(''); setAiSuggestion(''); }} className="px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl sm:rounded-2xl border border-gray-200 bg-white hover:bg-gray-50">Reset</button>
             </div>
           </form>
         </div>
 
         {/* Right - Results & AI suggestions */}
-        <div className="bg-gradient-to-br from-emerald-50 to-white rounded-3xl p-8 flex flex-col items-center justify-center shadow-md">
+        <div className="bg-gradient-to-br from-emerald-50 to-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 flex flex-col items-center justify-center shadow-md">
           <div className="w-full max-w-md">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">Quick Preview</h3>
-                <p className="text-sm text-gray-500">Illustration & instant feedback</p>
+            <div className="flex items-center justify-between mb-5 sm:mb-6">
+              <div className="min-w-0 flex-1 mr-3">
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 truncate">Quick Preview</h3>
+                <p className="text-xs sm:text-sm text-gray-500 truncate">Illustration & instant feedback</p>
               </div>
-              <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                <EcoLeaf className="w-8 h-8"/>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
+                <EcoLeaf className="w-7 h-7 sm:w-8 sm:h-8"/>
               </div>
             </div>
 
-            <div className="rounded-xl border border-emerald-100 bg-white p-6">
-              <div className="flex items-center justify-center mb-4">
-                <EcoCar className="w-full h-40" />
+            <div className="rounded-lg sm:rounded-xl border border-emerald-100 bg-white p-4 sm:p-6">
+              <div className="flex items-center justify-center mb-3 sm:mb-4">
+                <EcoCar className="w-full h-32 sm:h-40" />
               </div>
 
               {result === null ? (
                 <div className="text-center text-gray-500">
-                  <p className="font-medium">No calculation yet</p>
+                  <p className="font-medium text-sm sm:text-base">No calculation yet</p>
                   <p className="text-xs mt-1">Enter your vehicle data to see estimated CO₂</p>
                 </div>
               ) : (
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-emerald-600">{result} <span className="text-sm font-medium text-gray-600">kg CO₂</span></div>
-                  <p className="mt-2 text-sm text-gray-600">Estimated emissions for this trip</p>
+                  <div className="text-3xl sm:text-4xl font-bold text-emerald-600">{result} <span className="text-xs sm:text-sm font-medium text-gray-600">kg CO₂</span></div>
+                  <p className="mt-2 text-xs sm:text-sm text-gray-600">Estimated emissions for this trip</p>
 
                   {/* 🧠 AI Suggestion Card */}
                   {aiSuggestion && (
-                    <div className="mt-6 bg-emerald-50 border border-emerald-200 rounded-2xl p-4 shadow-sm text-gray-700 text-sm">
+                    <div className="mt-4 sm:mt-6 bg-emerald-50 border border-emerald-200 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm text-gray-700 text-xs sm:text-sm">
                       <p className="font-semibold text-emerald-700 mb-1">🌿 Eco Tip for You</p>
                       <p>{aiSuggestion}</p>
                     </div>

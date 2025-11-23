@@ -68,7 +68,7 @@ export const ProfilePanel = ({ stats, isLoading, onProfileClick }: ProfilePanelP
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 384, opacity: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="w-96 bg-gradient-to-br from-white via-gray-50/50 to-emerald-50/30 backdrop-blur-2xl h-screen border-l border-gray-200/50 shadow-2xl flex flex-col relative"
+        className="hidden xl:flex w-80 2xl:w-96 bg-gradient-to-br from-white via-gray-50/50 to-emerald-50/30 backdrop-blur-2xl h-screen border-l border-gray-200/50 shadow-2xl flex-col relative"
       >
         {/* Close Button */}
         <button
@@ -79,7 +79,7 @@ export const ProfilePanel = ({ stats, isLoading, onProfileClick }: ProfilePanelP
         </button>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-8 space-y-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <div className="flex-1 overflow-y-auto px-4 lg:px-6 py-6 lg:py-8 space-y-4 lg:space-y-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
           {/* Profile Header */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}

@@ -89,16 +89,16 @@ export const OverviewNew = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       <div className="max-w-[1400px] mx-auto">
         {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
           {/* Performance Card - Dark */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 shadow-2xl"
+            className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl"
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-white font-bold text-lg">Performance</h3>
@@ -158,12 +158,12 @@ export const OverviewNew = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="lg:col-span-2 bg-gradient-to-br from-sky-200 to-cyan-300 rounded-3xl p-6 shadow-xl relative overflow-hidden"
+            className="lg:col-span-2 bg-gradient-to-br from-sky-200 to-cyan-300 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xl relative overflow-hidden"
           >
-            <div className="flex items-center gap-6 mb-6">
+            <div className="flex items-center gap-3 sm:gap-6 mb-4 sm:mb-6 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('activity')}
-                className={`text-lg font-bold pb-2 transition-all ${
+                className={`text-base sm:text-lg font-bold pb-2 transition-all whitespace-nowrap ${
                   activeTab === 'activity'
                     ? 'text-slate-900 border-b-4 border-slate-900'
                     : 'text-slate-600'
@@ -173,7 +173,7 @@ export const OverviewNew = () => {
               </button>
               <button
                 onClick={() => setActiveTab('clicks')}
-                className={`text-lg font-medium pb-2 transition-all ${
+                className={`text-base sm:text-lg font-medium pb-2 transition-all whitespace-nowrap ${
                   activeTab === 'clicks'
                     ? 'text-slate-900 border-b-4 border-slate-900'
                     : 'text-slate-600'
@@ -183,7 +183,7 @@ export const OverviewNew = () => {
               </button>
               <button
                 onClick={() => setActiveTab('sales')}
-                className={`text-lg font-medium pb-2 transition-all ${
+                className={`text-base sm:text-lg font-medium pb-2 transition-all whitespace-nowrap ${
                   activeTab === 'sales'
                     ? 'text-slate-900 border-b-4 border-slate-900'
                     : 'text-slate-600'
@@ -191,27 +191,27 @@ export const OverviewNew = () => {
               >
                 Sales
               </button>
-              <div className="ml-auto">
-                <button className="px-4 py-2 bg-slate-900 text-white text-sm rounded-xl font-medium">
+              <div className="ml-auto flex-shrink-0">
+                <button className="px-3 sm:px-4 py-1.5 sm:py-2 bg-slate-900 text-white text-xs sm:text-sm rounded-xl font-medium">
                   Week
                 </button>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-white rounded-2xl px-4 py-3 shadow-lg flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mb-4">
+              <div className="bg-white rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-lg flex items-center gap-2">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                   </svg>
                 </div>
                 <div>
-                  <div className="text-slate-900 font-bold text-lg">12,560</div>
+                  <div className="text-slate-900 font-bold text-base sm:text-lg">12,560</div>
                   <div className="text-slate-500 text-xs">Your data</div>
                 </div>
               </div>
-              <div className="text-slate-600 text-sm">
-                Your data updates<br />every <span className="font-bold">3 hours</span>
+              <div className="text-slate-600 text-xs sm:text-sm">
+                Your data updates<br className="hidden sm:block" /><span className="sm:hidden"> </span>every <span className="font-bold">3 hours</span>
               </div>
             </div>
 
@@ -247,15 +247,15 @@ export const OverviewNew = () => {
         </div>
 
         {/* Your Courses Section */}
-        <div className="mb-4">
+        <div className="mb-3 sm:mb-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-slate-900">Your courses</h2>
-            <div className="flex gap-2">
-              <button className="w-10 h-10 rounded-xl bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors">
-                <ChevronRight className="w-5 h-5 text-slate-600 rotate-180" />
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Your courses</h2>
+            <div className="flex gap-1.5 sm:gap-2">
+              <button className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors">
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 rotate-180" />
               </button>
-              <button className="w-10 h-10 rounded-xl bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors">
-                <ChevronRight className="w-5 h-5 text-slate-600" />
+              <button className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors">
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
               </button>
             </div>
           </div>
@@ -269,16 +269,16 @@ export const OverviewNew = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1 * index }}
-              className={`bg-gradient-to-br ${course.color} rounded-3xl p-6 shadow-xl relative overflow-hidden group cursor-pointer hover:shadow-2xl transition-shadow`}
+              className={`bg-gradient-to-br ${course.color} rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xl relative overflow-hidden group cursor-pointer hover:shadow-2xl transition-shadow`}
             >
               <div className="relative z-10">
-                <h3 className="text-slate-900 font-bold text-xl mb-1">{course.title}</h3>
-                <p className="text-slate-700 text-sm mb-8">by {course.instructor}</p>
+                <h3 className="text-slate-900 font-bold text-lg sm:text-xl mb-1">{course.title}</h3>
+                <p className="text-slate-700 text-xs sm:text-sm mb-6 sm:mb-8">by {course.instructor}</p>
 
                 {/* Progress Circle */}
-                <div className="mb-8">
-                  <div className="relative w-24 h-24">
-                    <svg className="w-24 h-24 transform -rotate-90">
+                <div className="mb-6 sm:mb-8">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24">
+                    <svg className="w-20 h-20 sm:w-24 sm:h-24 transform -rotate-90">
                       <circle
                         cx="48"
                         cy="48"
@@ -313,12 +313,12 @@ export const OverviewNew = () => {
 
               {/* Bottom Stats */}
               <div className="relative z-10 flex items-center justify-between">
-                <div className="flex items-center gap-4 text-slate-900 text-sm font-medium">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-slate-900 text-xs sm:text-sm font-medium">
                   <span>{course.lessons}/{course.totalLessons} lessons</span>
                   <span>{course.tasks}/{course.totalTasks} tasks</span>
                 </div>
-                <button className="w-10 h-10 rounded-xl bg-white/80 flex items-center justify-center hover:bg-white transition-colors">
-                  <ArrowRight className="w-5 h-5 text-slate-900" />
+                <button className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/80 flex items-center justify-center hover:bg-white transition-colors flex-shrink-0">
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-900" />
                 </button>
               </div>
             </motion.div>

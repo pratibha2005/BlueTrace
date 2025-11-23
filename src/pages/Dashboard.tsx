@@ -18,11 +18,11 @@ export const Dashboard = () => {
   }, []);
 
   return (
-    <div className="flex bg-gray-50 h-screen overflow-hidden">
+    <div className="flex bg-gray-50 min-h-screen overflow-hidden">
       
       <Sidebar active={activeSection} onSelect={setActiveSection} />
 
-      <main className="flex-1 overflow-y-auto overflow-x-hidden">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden w-full">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeSection}

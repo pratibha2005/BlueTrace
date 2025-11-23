@@ -246,7 +246,7 @@ export const Badges = () => {
           >
             <div className="flex items-center justify-center gap-4 mb-3">
               <motion.div
-                animate={{ rotate: [0, 360] }}
+                animate={{ rotate: window.innerWidth >= 768 ? [0, 360] : 0 }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 className="w-16 h-16 bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-500 rounded-3xl flex items-center justify-center shadow-2xl"
               >

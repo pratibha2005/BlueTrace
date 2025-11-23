@@ -721,7 +721,7 @@ export const AwarenessVideos = () => {
         >
           <div className="flex items-center gap-4 mb-6">
             <motion.div 
-              animate={{ rotate: [0, 5, -5, 0] }}
+              animate={{ rotate: window.innerWidth >= 768 ? [0, 5, -5, 0] : 0 }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               className="w-16 h-16 bg-gradient-to-br from-emerald-500 via-teal-600 to-green-600 rounded-2xl flex items-center justify-center shadow-lg"
             >

@@ -146,31 +146,31 @@ export const Home = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         {/* --- Hero Section --- */}
-        <div className="grid md:grid-cols-2 gap-12 items-center text-center md:text-left mb-20">
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-center text-center md:text-left mb-12 sm:mb-16 lg:mb-20">
           <div>
-            <h1 className="text-5xl lg:text-6xl font-extrabold text-gray-800 mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-800 mb-4 sm:mb-6 leading-tight">
               BlueTrace - <span className="text-green-600">Land Edition</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-xl mb-8">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-xl mx-auto md:mx-0 mb-6 sm:mb-8">
               Track, analyze, and reduce your land vehicle carbon emissions.
               Join the movement towards sustainable transportation and earn Green
               Badges for your eco-friendly efforts.
             </p>
 
-            <div className="mt-8 flex justify-center md:justify-start space-x-4">
+            <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-center md:justify-start gap-3 sm:gap-4">
               {user ? (
                 <>
                   <Link
                     to="/calculator"
-                    className="bg-green-600 text-white px-8 py-3 rounded-xl text-lg font-semibold shadow-lg hover:bg-green-700 transition transform hover:scale-105"
+                    className="bg-green-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-base sm:text-lg font-semibold shadow-lg hover:bg-green-700 transition transform hover:scale-105 text-center"
                   >
                     Calculate Emissions
                   </Link>
                   <Link
                     to="/dashboard"
-                    className="bg-white text-green-600 border-2 border-green-600 px-8 py-3 rounded-xl text-lg font-semibold shadow-lg hover:bg-green-50 transition transform hover:scale-105"
+                    className="bg-white text-green-600 border-2 border-green-600 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-base sm:text-lg font-semibold shadow-lg hover:bg-green-50 transition transform hover:scale-105 text-center"
                   >
                     View Dashboard
                   </Link>
@@ -179,13 +179,13 @@ export const Home = () => {
                 <>
                   <Link
                     to="/signup"
-                    className="bg-green-600 text-white px-8 py-3 rounded-xl text-lg font-semibold shadow-lg hover:bg-green-700 transition transform hover:scale-105"
+                    className="bg-green-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-base sm:text-lg font-semibold shadow-lg hover:bg-green-700 transition transform hover:scale-105 text-center"
                   >
                     Get Started Free!
                   </Link>
                   <Link
                     to="/login"
-                    className="bg-white text-green-600 border-2 border-green-600 px-8 py-3 rounded-xl text-lg font-semibold shadow-lg hover:bg-green-50 transition transform hover:scale-105"
+                    className="bg-white text-green-600 border-2 border-green-600 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-base sm:text-lg font-semibold shadow-lg hover:bg-green-50 transition transform hover:scale-105 text-center"
                   >
                     Login
                   </Link>
@@ -198,7 +198,7 @@ export const Home = () => {
             <Lottie
               animationData={Homesvg}
               loop
-              className="w-full h-auto max-w-lg mx-auto transform scale-125 translate-x-6 md:translate-x-24"
+              className="w-full h-auto max-w-md lg:max-w-lg mx-auto transform md:scale-110 lg:scale-125 md:translate-x-6 lg:translate-x-24"
             />
           </div>
         </div>
@@ -231,7 +231,7 @@ export const Home = () => {
           </div>
         </div> */}
         {/* --- Modern Feature Cards Section --- */}
-        <div className="relative z-10 py-20 px-4 mb-20 overflow-hidden">
+        <div className="relative z-10 py-10 sm:py-16 lg:py-20 px-4 sm:px-6 mb-12 sm:mb-16 lg:mb-20 overflow-hidden">
           {/* Animated Background with Gradient Mesh */}
           <div className="absolute inset-0 bg-gradient-to-br from-green-900 via-green-700 to-green-800 rounded-3xl">
             {/* Animated Gradient Orbs */}
@@ -273,15 +273,15 @@ export const Home = () => {
             </div>
           </div>
 
-          <div className="relative max-w-7xl mx-auto mb-20 text-center">
+          <div className="relative max-w-7xl mx-auto mb-10 sm:mb-16 lg:mb-20 text-center">
             {/* Floating Badge */}
             <div
-              className="inline-block mb-8 px-8 py-4 bg-gradient-to-r from-green-500/30 via-emerald-500/30 to-teal-500/30 backdrop-blur-2xl rounded-2xl border border-green-400/40 shadow-2xl hover:scale-105 transition-transform duration-500"
+              className="inline-block mb-6 sm:mb-8 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-gradient-to-r from-green-500/30 via-emerald-500/30 to-teal-500/30 backdrop-blur-2xl rounded-xl sm:rounded-2xl border border-green-400/40 shadow-2xl hover:scale-105 transition-transform duration-500"
               style={{
                 transform: `translateY(${Math.sin(scrollY * 0.01) * 10}px)`,
               }}
             >
-              <span className="text-green-300 font-bold text-base flex items-center gap-3 justify-center">
+              <span className="text-green-300 font-bold text-sm sm:text-base flex items-center gap-2 sm:gap-3 justify-center">
                 <Zap className="w-5 h-5 animate-pulse text-green-400" />
                 <span className="relative">
                   <span>Next-Gen Features</span>
@@ -295,7 +295,7 @@ export const Home = () => {
             </div>
 
             {/* Main Heading with Animated Gradient */}
-            <h2 className="text-6xl md:text-7xl lg:text-8xl font-black mb-8 leading-tight">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-6 sm:mb-8 leading-tight">
               <span
                 className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-green-300 via-emerald-300 to-teal-300 animate-pulse"
                 style={{
@@ -319,7 +319,7 @@ export const Home = () => {
             </h2>
 
             {/* Subtitle with Glow Effect */}
-            <p className="text-green-200/80 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
+            <p className="text-green-200/80 text-sm sm:text-base md:text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed px-4">
               Experience cutting-edge technology that makes sustainability{" "}
               <span className="text-green-300 font-semibold">effortless</span> and{" "}
               <span className="text-emerald-300 font-semibold">rewarding</span>
@@ -327,7 +327,7 @@ export const Home = () => {
           </div>
 
           {/* Feature Cards Grid */}
-          <div className="relative max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+          <div className="relative max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-10 sm:mb-16 lg:mb-20">
             {features.map((feature, index) => (
               <FeatureCard key={feature.title} {...feature} index={index} />
             ))}
@@ -342,7 +342,7 @@ export const Home = () => {
           </div>
         </div>
 
-        <div className=" rounded-2xl shadow-2xl p-10 mb-20 border-t-1  relative overflow-hidden">
+        <div className="rounded-2xl shadow-2xl p-6 sm:p-8 lg:p-10 mb-12 sm:mb-16 lg:mb-20 border-t-1 relative overflow-hidden">
           <div className="absolute inset-0 z-0">
             <Squares 
     speed={0.5}
@@ -352,10 +352,10 @@ export const Home = () => {
     hoverFillColor="#2b7447ff"
   />
   </div>
-          <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 sm:mb-8 text-center">
             Why BlueTrace Matters
           </h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             <StatCard number="45%" label="CO₂ reduction with public transport" />
             <StatCard number="70%" label="Lower emissions with electric vehicles" />
             <StatCard number="30%" label="Fuel efficiency improvement with eco-driving" />
@@ -363,11 +363,11 @@ export const Home = () => {
         </div>
 
         {/* --- CTA Section --- */}
-        <div className="text-center bg-green-700 text-white rounded-3xl p-16 shadow-2xl">
-          <h2 className="text-4xl font-extrabold mb-4">
+        <div className="text-center bg-green-700 text-white rounded-2xl sm:rounded-3xl p-8 sm:p-12 lg:p-16 shadow-2xl">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-3 sm:mb-4">
             Ready to Make a Difference? 🌍
           </h2>
-          <p className="text-lg mb-8 max-w-3xl mx-auto opacity-90">
+          <p className="text-base sm:text-lg mb-6 sm:mb-8 max-w-3xl mx-auto opacity-90">
             Join thousands of users tracking their carbon footprint and working
             towards a cleaner, greener future for transportation. Every
             kilometer counts.
@@ -375,7 +375,7 @@ export const Home = () => {
           {!user && (
             <Link
               to="/signup"
-              className="inline-block bg-white text-green-700 px-10 py-4 rounded-full text-xl font-bold hover:bg-green-100 transition transform hover:scale-105 shadow-xl"
+              className="inline-block bg-white text-green-700 px-6 sm:px-8 lg:px-10 py-3 sm:py-4 rounded-full text-base sm:text-lg lg:text-xl font-bold hover:bg-green-100 transition transform hover:scale-105 shadow-xl"
             >
               Start Your Journey Today!
             </Link>

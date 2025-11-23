@@ -149,7 +149,7 @@ export default function RouteOptimizer() {
         >
           <div className="flex items-center justify-center gap-4 mb-4">
             <motion.div 
-              animate={{ rotate: [0, 360] }}
+              animate={{ rotate: window.innerWidth >= 768 ? [0, 360] : 0 }}
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
               className="w-20 h-20 bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-3xl flex items-center justify-center shadow-2xl"
             >
@@ -362,7 +362,7 @@ export default function RouteOptimizer() {
             <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity duration-300" />
             <div className="relative z-10 flex items-center gap-6">
               <motion.div 
-                animate={{ rotate: [0, 10, -10, 0] }}
+                animate={{ rotate: window.innerWidth >= 768 ? [0, 10, -10, 0] : 0 }}
                 transition={{ duration: 2, repeat: Infinity }}
                 className="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center backdrop-blur-sm shadow-xl"
               >

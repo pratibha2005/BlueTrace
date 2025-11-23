@@ -41,7 +41,7 @@ export const Login = () => {
 
   return (
     // Unique Background: Gradient with soft "blobs" for visual interest
-    <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" 
+    <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-3 sm:p-4 md:p-6" 
         style={{ 
             // background: 'linear-gradient(135deg, #ffffffff 0%, #094301ff 100%)' 
         }}>
@@ -66,13 +66,13 @@ export const Login = () => {
         */}
 
         {/* Main Split-Screen Container */}
-        <div className="relative z-10 w-full max-w-4xl min-h-[500px] grid md:grid-cols-2 shadow-2xl rounded-3xl overflow-hidden">
+        <div className="relative z-10 w-full max-w-4xl min-h-[400px] sm:min-h-[500px] grid md:grid-cols-2 shadow-2xl rounded-2xl sm:rounded-3xl overflow-hidden">
             
             {/* LEFT SIDE: The Glassmorphism Form Container */}
-            <div className="p-8 sm:p-12 backdrop-filter backdrop-blur-lg bg-white/10 border border-white/20">
-                <div className="text-center mb-6">
-                    <h2 className="text-4xl font-extrabold text-black">Log In</h2>
-                    <p className="text-black-300 mt-2">Welcome to a cleaner future</p>
+            <div className="p-6 sm:p-8 lg:p-12 backdrop-filter backdrop-blur-lg bg-white/10 border border-white/20">
+                <div className="text-center mb-5 sm:mb-6">
+                    <h2 className="text-3xl sm:text-4xl font-extrabold text-black">Log In</h2>
+                    <p className="text-black-300 mt-2 text-sm sm:text-base">Welcome to a cleaner future</p>
                 </div>
 
                 {error && (
@@ -82,15 +82,15 @@ export const Login = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                     {/* Email Field */}
                     <div className="relative">
-                        <Mail className="absolute top-1/2 left-4 transform -translate-y-1/2 w-5 h-5 text-teal-300/80" />
+                        <Mail className="absolute top-1/2 left-3 sm:left-4 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-teal-300/80" />
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full pl-12 pr-5 py-3 bg-white/20 border border-gray/100 text-black placeholder-gray/900 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-150"
+                            className="w-full pl-10 sm:pl-12 pr-4 sm:pr-5 py-2.5 sm:py-3 text-sm sm:text-base bg-white/20 border border-gray/100 text-black placeholder-gray/900 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-150"
                             placeholder="Email"
                             required
                         />
@@ -98,12 +98,12 @@ export const Login = () => {
 
                     {/* Password Field */}
                     <div className="relative">
-                        <Lock className="absolute top-1/2 left-4 transform -translate-y-1/2 w-5 h-5 text-teal-300/80" />
+                        <Lock className="absolute top-1/2 left-3 sm:left-4 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-teal-300/80" />
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full pl-12 pr-5 py-3 bg-white/20 border border-gray/100 text-black placeholder-gray/100 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-150"
+                            className="w-full pl-10 sm:pl-12 pr-4 sm:pr-5 py-2.5 sm:py-3 text-sm sm:text-base bg-white/20 border border-gray/100 text-black placeholder-gray/100 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-150"
                             placeholder="Password"
                             required
                         />
@@ -114,7 +114,7 @@ export const Login = () => {
                         type="submit"
                         disabled={loading}
                         // Gradient Button for a stylish look
-                        className="w-full flex items-center justify-center bg-gradient-to-r from-teal-500 to-green-500 text-white py-3.5 rounded-xl font-extrabold text-lg shadow-lg shadow-teal-500/30 hover:from-teal-600 hover:to-green-600 transition duration-300 disabled:opacity-50 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-teal-500/50"
+                        className="w-full flex items-center justify-center bg-gradient-to-r from-teal-500 to-green-500 text-white py-3 sm:py-3.5 rounded-xl font-extrabold text-base sm:text-lg shadow-lg shadow-teal-500/30 hover:from-teal-600 hover:to-green-600 transition duration-300 disabled:opacity-50 disabled:shadow-none focus:outline-none focus:ring-4 focus:ring-teal-500/50"
                     >
                         {loading ? (
                             <span className="flex items-center">
@@ -141,9 +141,9 @@ export const Login = () => {
             </div>
 {/* Working of the a ndaioo */}
             {/* RIGHT SIDE: The Design/Branding Panel with Animation */}
-            <div className="hidden md:flex flex-col items-center justify-center bg-teal-600/20 p-12 relative overflow-hidden">
+            <div className="hidden md:flex flex-col items-center justify-center bg-teal-600/20 p-6 lg:p-12 relative overflow-hidden">
                 {/* Visual Title */}
-                <h3 className="text-5xl font-black text-gray-700 z-10 mb-4 tracking-tighter">
+                <h3 className="text-4xl lg:text-5xl font-black text-gray-700 z-10 mb-4 tracking-tighter">
                     Eco
                     <span className="text-green-700">Drive</span>
                 </h3>
