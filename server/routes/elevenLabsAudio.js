@@ -119,10 +119,28 @@ router.post('/generate-audio', async (req, res) => {
 
   } catch (error) {
     console.error('ElevenLabs audio generation error:', error);
+    
+    // Check if ElevenLabs is blocked (401 with unusual_activity)
+    if (error.statusCode === 401 && error.body?.detail?.status === 'detected_unusual_activity') {
+      console.log('⚠️ ElevenLabs Free Tier blocked - sending flag to use browser TTS');
+      return res.status(200).json({ 
+        success: false,
+        useBrowserTTS: true,
+        error: 'ElevenLabs Free Tier is blocked for this server IP',
+        message: 'Will use browser text-to-speech instead',
+        text: text,
+        language: language
+      });
+    }
+    
+    // For other errors, return error but allow browser TTS fallback
     res.status(500).json({ 
+      success: false,
+      useBrowserTTS: true,
       error: 'Failed to generate audio',
       message: error.message,
-      details: error.response?.data || error
+      text: text,
+      language: language
     });
   }
 });

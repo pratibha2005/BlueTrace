@@ -207,12 +207,45 @@ export const AwarenessVideos = () => {
         const textToSpeak = scene.text || `Scene ${currentSceneIndex + 1}`;
         
         try {
-          console.log(`Generating ElevenLabs audio for scene ${currentSceneIndex + 1}...`);
+          console.log(`Generating audio for scene ${currentSceneIndex + 1}...`);
           
-          // Generate audio with ElevenLabs
+          // Try ElevenLabs first
           const audioData = await elevenLabsAPI.generateAudio(textToSpeak, selectedVideo.language);
           
-          // Create audio element and play
+          // Check if we should use browser TTS instead
+          if (audioData.useBrowserTTS) {
+            console.log('⚠️ ElevenLabs blocked - using browser Text-to-Speech');
+            
+            // Use browser's built-in speech synthesis
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.lang = selectedVideo.language === 'Hindi' ? 'hi-IN' : 'en-US';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            
+            utterance.onend = () => {
+              console.log(`Scene ${currentSceneIndex + 1} audio completed (Browser TTS)`);
+              currentSceneIndex++;
+              if (currentSceneIndex < selectedVideo.scenes.length) {
+                setTimeout(playSceneWithElevenLabs, 500);
+              } else {
+                setIsPlaying(false);
+                setCurrentScene(0);
+                setProgress(0);
+              }
+            };
+            
+            utterance.onerror = () => {
+              currentSceneIndex++;
+              if (currentSceneIndex < selectedVideo.scenes.length) {
+                setTimeout(playSceneWithElevenLabs, 500);
+              }
+            };
+            
+            window.speechSynthesis.speak(utterance);
+            return;
+          }
+          
+          // Use ElevenLabs audio
           const audio = new Audio(`data:audio/mpeg;base64,${audioData.audio}`);
           audioRef.current = audio;
           

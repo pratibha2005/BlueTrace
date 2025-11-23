@@ -162,12 +162,41 @@ export const aiVideoAPI = {
 
 export const elevenLabsAPI = {
   generateAudio: async (text: string, language: string) => {
-    const response = await fetch(`${API_BASE_URL}/elevenlabs/generate-audio`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ text, language })
-    });
-    return handleResponse(response);
+    try {
+      const response = await fetch(`${API_BASE_URL}/elevenlabs/generate-audio`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ text, language })
+      });
+      
+      const data = await response.json();
+      
+      // Check if server is telling us to use browser TTS
+      if (data.useBrowserTTS) {
+        console.log('⚠️ ElevenLabs unavailable, using browser TTS');
+        return {
+          success: false,
+          useBrowserTTS: true,
+          text: data.text,
+          language: data.language
+        };
+      }
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate audio');
+      }
+      
+      return data;
+    } catch (error: any) {
+      console.error('Audio generation error:', error);
+      // Return flag to use browser TTS
+      return {
+        success: false,
+        useBrowserTTS: true,
+        text: text,
+        language: language
+      };
+    }
   },
   
   checkHealth: async () => {
