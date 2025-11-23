@@ -144,10 +144,10 @@ export const Sidebar = ({ active, onSelect }: SidebarProps) => {
       </motion.div>
 
       {/* NAVIGATION SECTION - centered with gradient background */}
-      <div className="relative flex-1 flex flex-col items-center justify-center gap-1.5 md:gap-3">
+      <div className="relative flex-1 flex flex-col items-center justify-center gap-1.5 md:gap-2 overflow-y-auto py-4 scrollbar-thin scrollbar-thumb-emerald-600 scrollbar-track-transparent">
         {/* Curved gradient background for navigation icons */}
         <div 
-          className="absolute bg-gradient-to-b from-emerald-600 via-teal-600 to-green-700 z-0 rounded-r-[50px] md:rounded-r-[80px] -left-3 right-0 top-4 bottom-4 w-[calc(100%+12px)] md:-left-5 md:top-[26px] md:bottom-[26px] md:w-[calc(100%+20px)]" 
+          className="absolute bg-gradient-to-b from-emerald-600 via-teal-600 to-green-700 z-0 rounded-r-[50px] md:rounded-r-[80px] -left-3 right-0 top-2 bottom-2 w-[calc(100%+12px)] md:-left-5 md:top-4 md:bottom-4 md:w-[calc(100%+20px)]" 
         ></div>
         
         {/* Navigation Items */}
