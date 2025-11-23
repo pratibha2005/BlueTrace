@@ -171,25 +171,32 @@ export const elevenLabsAPI = {
       
       const data = await response.json();
       
-      // Check if server is telling us to use browser TTS
+      // Check if server is telling us to use browser TTS (check this FIRST, before response.ok)
       if (data.useBrowserTTS) {
-        console.log('⚠️ ElevenLabs unavailable, using browser TTS');
+        console.log('✅ Using browser TTS (ElevenLabs unavailable)');
         return {
           success: false,
           useBrowserTTS: true,
-          text: data.text,
-          language: data.language
+          text: data.text || text,
+          language: data.language || language
         };
       }
       
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate audio');
+        // If it's not ok and no useBrowserTTS flag, throw error
+        console.log('⚠️ Audio API error, falling back to browser TTS');
+        return {
+          success: false,
+          useBrowserTTS: true,
+          text: text,
+          language: language
+        };
       }
       
       return data;
     } catch (error: any) {
-      console.error('Audio generation error:', error);
-      // Return flag to use browser TTS
+      // Network error or JSON parse error - use browser TTS
+      console.log('✅ Network error, using browser TTS');
       return {
         success: false,
         useBrowserTTS: true,

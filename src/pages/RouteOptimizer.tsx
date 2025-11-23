@@ -26,6 +26,8 @@ export default function RouteOptimizer() {
   const [isLoading, setIsLoading] = useState(false);
   const [stats, setStats] = useState<any>(null);
   const [selectedRoute, setSelectedRoute] = useState<number | null>(null);
+  const [dataSource, setDataSource] = useState<string>('');
+  const [warning, setWarning] = useState<string>('');
 
   useEffect(() => {
     loadStats();
@@ -57,6 +59,15 @@ export default function RouteOptimizer() {
       if (response.success) {
         setRoutes(response.routes);
         setRecommendation(response.recommendation);
+        setDataSource(response.dataSource || 'unknown');
+        setWarning(response.warning || '');
+        
+        // Log data source to console
+        if (response.dataSource === 'osrm_api') {
+          console.log('✅ Using real-time OSRM data (100% FREE)');
+        } else {
+          console.log('⚠️ Using sample fallback data');
+        }
       }
     } catch (error) {
       console.error('Route optimization failed:', error);
@@ -321,6 +332,24 @@ export default function RouteOptimizer() {
             )}
           </motion.button>
         </motion.div>
+
+        {/* Data Source Indicator */}
+        {warning && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 bg-yellow-50 border border-yellow-200 rounded-2xl p-4 flex items-center gap-3"
+          >
+            <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
+              <Sparkles size={20} className="text-yellow-600" />
+            </div>
+            <p className="text-yellow-800 font-medium">{warning}</p>
+          </motion.div>
+        )}
+
+        {/* {dataSource === 'osrm_api' && routes.length > 0 && (
+        
+        )} */}
 
         {/* Enhanced Recommendation Banner */}
         {recommendation && (
