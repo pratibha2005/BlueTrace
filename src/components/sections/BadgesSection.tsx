@@ -9,17 +9,21 @@ import {
   Calendar,
   Target,
   CheckCircle,
-  Crown,
 } from "lucide-react";
-import { badgeAPI } from "../../services/api";
+import { badgeAPI, leaderboardAPI } from "../../services/api";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 
 interface Badge {
   name: string;
   description: string;
   dateEarned: string;
   emissionReduction: number;
+}
+
+interface UserRank {
+  name: string;
+  icon: string;
+  color: string;
 }
 
 // Apple-style glass + pastel gradients
@@ -57,17 +61,28 @@ const badgeStyles = [
 ];
 
 export const Badges = () => {
-  const navigate = useNavigate();
   const [badges, setBadges] = useState<Badge[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'earned' | 'locked'>('earned');
+  const [userRank, setUserRank] = useState<UserRank>({ name: 'Beginner', icon: '🌱', color: 'green' });
 
   useEffect(() => {
+    // Fetch badges
     badgeAPI
       .getBadges()
       .then((data) => setBadges(data))
       .catch((err) => console.error("Failed to fetch badges:", err))
       .finally(() => setLoading(false));
+
+    // Fetch user rank from leaderboard
+    leaderboardAPI
+      .getLeaderboard()
+      .then((response) => {
+        if (response.success && response.currentUser) {
+          setUserRank(response.currentUser.rank);
+        }
+      })
+      .catch((err) => console.error("Failed to fetch user rank:", err));
   }, []);
 
   if (loading) {
@@ -175,12 +190,12 @@ export const Badges = () => {
               <div className="flex items-center justify-between p-5 bg-white/60 rounded-2xl border border-green-100 shadow-md hover:shadow-xl transition-all hover:scale-105">
                 <div className="flex items-center gap-3">
                   <div className="w-14 h-14 bg-gradient-to-br from-purple-100 to-fuchsia-200 rounded-xl flex items-center justify-center shadow-lg">
-                    <Trophy className="w-7 h-7 text-purple-600" />
+                    <span className="text-3xl">{userRank.icon}</span>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Eco Rank</p>
                     <p className="text-2xl font-bold text-gray-900">
-                      Platinum
+                      {userRank.name}
                     </p>
                   </div>
                 </div>
@@ -213,26 +228,7 @@ export const Badges = () => {
             </div>
           </div>
 
-          {/* Leaderboard Button */}
-          <motion.button
-            onClick={() => navigate('/leaderboard')}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full backdrop-blur-2xl bg-gradient-to-r from-purple-500 via-blue-500 to-green-500 rounded-3xl p-8 shadow-xl border border-white/60 text-white group cursor-pointer hover:shadow-2xl transition-all"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition">
-                  <Crown className="w-8 h-8 text-white" />
-                </div>
-                <div className="text-left">
-                  <p className="text-xl font-bold">View Leaderboard</p>
-                  <p className="text-sm text-white/80">Compete with eco-warriors!</p>
-                </div>
-              </div>
-              <TrendingUp className="w-6 h-6 text-white group-hover:translate-x-1 transition" />
-            </div>
-          </motion.button>
+
         </motion.div>
 
         {/* MAIN BADGE CONTENT */}
